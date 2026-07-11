@@ -12,14 +12,16 @@
             <TextBox x:Name="EmailTextBox" PlaceholderText="Email du client" />
             <Button Content="Ajouter" Click="AddClient_Click"/>
             <TextBlock x:Name="MessageTextBlock" />
-            <ListBox x:Name="ClientListBox" Height="150" >
+            <ListBox x:Name="ClientListBox" Height="150" SelectionChanged="ClientListBox_SelectionChanged" >
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:Client">
-                        <Grid ColumnDefinitions="180,*"
+                        <Grid ColumnDefinitions="60,180,*"
                               ColumnSpacing="15">
                             <TextBlock Grid.Column="0"
+                            Text="{Binding Id}" />
+                            <TextBlock Grid.Column="1"
                             Text="{Binding Nom}" />
-                            <TextBlock  Grid.Column="1"
+                            <TextBlock  Grid.Column="2"
                             Text="{Binding Email}" />
                         </Grid>
                     </DataTemplate>

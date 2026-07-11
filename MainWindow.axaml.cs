@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Selection;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
@@ -52,5 +53,13 @@ public partial class MainWindow : Window
         MessageTextBlock.Text = $"Client enregistré : Id : {client.Id} | Nom : {nom} | Email : {email}";
     }
 
+    private void ClientListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ClientListBox.SelectedItem is not Client selectedClient)
+        {
+            return;
+        }
 
+        MessageTextBlock.Text = $"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}";
+    }
 }
