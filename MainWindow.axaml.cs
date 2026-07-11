@@ -108,11 +108,21 @@ public partial class MainWindow : Window
         MessageTextBlock.Text = $"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}";
     }
 
-    private void DeleteClient_Click(object? sender, RoutedEventArgs e)
+    private async void DeleteClient_Click(object? sender, RoutedEventArgs e)
     {
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
             MessageTextBlock.Text = "Sélectionne un client à supprimer.";
+            return;
+        }
+
+        DeleteConfirmationWindow confirmationWindow = new DeleteConfirmationWindow(selectedClient);
+
+        bool isConfirmed = await confirmationWindow.ShowDialog<bool>(this);
+
+        if (!isConfirmed)
+        {
+            MessageTextBlock.Text = "Suppression annulée.";
             return;
         }
 
