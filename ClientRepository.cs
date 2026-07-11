@@ -56,4 +56,26 @@ public class ClientRepository
         
         return clients;
     }
+
+    public bool Update(Client client)
+    {
+        using var connection = Database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = 
+        """
+        UPDATE Clients
+        SET Nom = @nom,
+            Email = @email
+        WHERE Id = @id;
+        """;
+
+        command.Parameters.AddWithValue("@nom", client.Nom);
+        command.Parameters.AddWithValue("@email", client.Email);
+        command.Parameters.AddWithValue("@id", client.Id);
+
+        int rowAffected = command.ExecuteNonQuery();
+
+        return rowAffected > 0;
+    }
 }

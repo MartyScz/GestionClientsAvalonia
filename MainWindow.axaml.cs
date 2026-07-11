@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
+using Avalonia.Interactivity;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
@@ -65,4 +66,46 @@ public partial class MainWindow : Window
 
         MessageTextBlock.Text = $"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}";
     }
+
+    private void UpdateClient_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ClientListBox.SelectedItem is not Client selectedClient)
+        {
+            MessageTextBlock.Text = "Sélectionne un client à modifier.";
+            return;
+        }
+
+        string nom = NomTextBox.Text ?? "";
+        string email = EmailTextBox.Text ?? "";
+
+        if (string.IsNullOrWhiteSpace(nom) || string.IsNullOrWhiteSpace(email))
+        {
+            MessageTextBlock.Text = "Le nom et l'email sont obligatoires.";
+            return;
+        }
+
+        Client updateClient = new Client
+        {
+            Id = selectedClient.Id,
+            Nom = nom,
+            Email = email
+        };
+
+        bool isUpdated = _clientRepository.Update(updateClient);
+
+        if (!isUpdated)
+        {
+            MessageTextBlock.Text = " Le client n'a pas été trouvé dans la base.";
+            return;
+        }
+
+        int SelectedIndex = ClientListBox.SelectedIndex;
+
+        _clients[SelectedIndex] = updateClient;
+
+        ClientListBox.SelectedItem = updateClient;
+
+        MessageTextBlock.Text = $"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}";
+    }
+
 }
