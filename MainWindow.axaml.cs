@@ -7,6 +7,7 @@ namespace GestionClientsAvalonia;
 public partial class MainWindow : Window
 {
     private readonly ObservableCollection<Client> _clients = new();
+    private readonly ClientRepository _clientRepository = new();
 
     public MainWindow()
     {
@@ -34,11 +35,12 @@ public partial class MainWindow : Window
             Email = email
         };
 
+        client.Id = _clientRepository.Add(client);
         _clients.Add(client);
 
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
 
-        MessageTextBlock.Text = $"Client ajouté : Nom : {nom} | Email : {email}";
+        MessageTextBlock.Text = $"Client enregistré : Id : {client.Id} | Nom : {nom} | Email : {email}";
     }
 }
