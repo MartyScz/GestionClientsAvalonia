@@ -60,6 +60,9 @@ public partial class MainWindow : Window
             return;
         }
 
+        NomTextBox.Text = selectedClient.Nom;
+        EmailTextBox.Text = selectedClient.Email;
+
         MessageTextBlock.Text = $"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}";
     }
 }
