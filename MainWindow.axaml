@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:GestionClientsAvalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="GestionClientsAvalonia.MainWindow"
+        Title="Gestion Clients">
+        <StackPanel Margin="20" Spacing="10">
+            <TextBlock Text="Gestion Clients" FontSize="28" />
+            <TextBox x:Name="NomTextBox" PlaceholderText="Nom du client" />
+            <TextBox x:Name="EmailTextBox" PlaceholderText="Email du client" />
+            <Button Content="Ajouter" Click="AddClient_Click"/>
+            <TextBlock x:Name="MessageTextBlock" />
+            <ListBox x:Name="ClientListBox" Height="150" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:Client">
+                        <Grid ColumnDefinitions="180,*"
+                              ColumnSpacing="15">
+                            <TextBlock Grid.Column="0"
+                            Text="{Binding Nom}" />
+                            <TextBlock  Grid.Column="1"
+                            Text="{Binding Email}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+</Window>
