@@ -108,4 +108,28 @@ public partial class MainWindow : Window
         MessageTextBlock.Text = $"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}";
     }
 
+    private void DeleteClient_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ClientListBox.SelectedItem is not Client selectedClient)
+        {
+            MessageTextBlock.Text = "Sélectionne un client à supprimer.";
+            return;
+        }
+
+        bool isDeleted = _clientRepository.Delete(selectedClient.Id);
+
+        if (!isDeleted)
+        {
+            MessageTextBlock.Text = "Le client n'a pas été trouvé dans la base.";
+            return;
+        }
+
+        _clients.Remove(selectedClient);
+
+        NomTextBox.Text ="";
+        EmailTextBox.Text ="";
+
+        MessageTextBlock.Text = $"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.";
+    }
+
 }

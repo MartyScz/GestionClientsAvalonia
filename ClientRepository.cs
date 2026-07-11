@@ -78,4 +78,22 @@ public class ClientRepository
 
         return rowAffected > 0;
     }
+
+    public bool Delete(int id)
+    {
+        using var connection = Database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = 
+        """
+        DELETE FROM Clients
+        WHERE Id = @id;
+        """;
+
+        command.Parameters.AddWithValue("@id", id);
+
+        int rowAffected = command.ExecuteNonQuery();
+
+        return rowAffected > 0;
+    }
 }
