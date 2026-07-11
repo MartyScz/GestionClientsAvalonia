@@ -7,9 +7,13 @@ namespace GestionClientsAvalonia;
 public partial class MainWindow : Window
 {
     private readonly ObservableCollection<Client> _clients = new();
+
     public MainWindow()
     {
         InitializeComponent();
+
+        using var connection = Database.OpenConnection();
+        Database.Initialize(connection);
         ClientListBox.ItemsSource = _clients;
     }
 
