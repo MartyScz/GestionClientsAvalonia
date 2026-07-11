@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
 
@@ -16,6 +17,13 @@ public partial class MainWindow : Window
         using var connection = Database.OpenConnection();
         Database.Initialize(connection);
         ClientListBox.ItemsSource = _clients;
+
+        List<Client> clientsFromDatabase = _clientRepository.GetAll();
+
+        foreach (Client client in clientsFromDatabase)
+        {
+            _clients.Add(client);
+        }
     }
 
     private void AddClient_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -43,4 +51,6 @@ public partial class MainWindow : Window
 
         MessageTextBlock.Text = $"Client enregistré : Id : {client.Id} | Nom : {nom} | Email : {email}";
     }
+
+
 }
