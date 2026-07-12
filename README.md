@@ -19,6 +19,7 @@ Projet en cours de développement.
 - Suppression persistante d'un client
 - Fenêtre de confirmation avant la suppression
 - Création automatique de la base et de la table Clients
+- Recherche de clients par nom ou adresse email
 
 ## Technologies utilisées
 
