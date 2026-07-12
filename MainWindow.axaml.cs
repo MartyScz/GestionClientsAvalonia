@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
+using Avalonia.Platform.Storage;
 
 namespace GestionClientsAvalonia;
 
@@ -167,6 +168,37 @@ public partial class MainWindow : Window
         }
 
         MessageTextBlock.Text = $"{searchResults.Count} client(s) trouvé(s).";
+    }
+
+    private async void ExportClients_Click( object? sender, RoutedEventArgs e)
+    {
+        var file = await StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title = "Exporter les clients",
+                SuggestedFileName = "clients.csv"
+            }
+        );
+
+        if (file is null)
+        {
+            MessageTextBlock.Text = "Export annulé.";
+            return;
+        }
+
+        string? filePath = file.TryGetLocalPath();
+
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            MessageTextBlock.Text = "Impossible de récupérer le chemin du fichier.";
+            return;
+        }
+
+        List<Client> clients = _clientRepository.GetAll();
+
+        CsvService.ExportClients(filePath, clients);
+
+        MessageTextBlock.Text = $"{clients.Count} client(s) exporté(s) dans {file.Name}.";
     }
 
 }

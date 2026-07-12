@@ -13,6 +13,7 @@
             <Button Content="Ajouter" Click="AddClient_Click"/>
             <Button Content="Modifier" Click="UpdateClient_Click" />
             <Button Content="Supprimer" Click="DeleteClient_Click" />
+            <Button Content="Exporter CSV" Click="ExportClients_Click" />
             <TextBlock x:Name="MessageTextBlock" />
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                 <TextBox x:Name="SearchTextBox" Grid.Column="0" PlaceholderText="Rechercher par Nom ou Email" />
