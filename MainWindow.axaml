@@ -14,6 +14,10 @@
             <Button Content="Modifier" Click="UpdateClient_Click" />
             <Button Content="Supprimer" Click="DeleteClient_Click" />
             <TextBlock x:Name="MessageTextBlock" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <TextBox x:Name="SearchTextBox" Grid.Column="0" PlaceholderText="Rechercher par Nom ou Email" />
+                <Button Grid.Column="1" Content="Rechercher" Click="SearchClient_Click" />
+            </Grid>
             <ListBox x:Name="ClientListBox" Height="150" SelectionChanged="ClientListBox_SelectionChanged" >
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:Client">

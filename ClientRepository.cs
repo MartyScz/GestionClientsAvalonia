@@ -1,3 +1,4 @@
+using Avalonia.Controls.Converters;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 
@@ -95,5 +96,43 @@ public class ClientRepository
         int rowAffected = command.ExecuteNonQuery();
 
         return rowAffected > 0;
+    }
+
+    public List<Client> Search(string searchText)
+    {
+        List<Client> clients = new();
+
+        using var connection = Database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = 
+        """
+        SELECT Id, Nom, Email
+        FROM Clients
+        WHERE Nom LIKE @search
+            OR Email Like @search
+        ORDER BY Id;
+        """;
+
+        command.Parameters.AddWithValue(
+            "@search",
+            $"%{searchText}%"
+        );
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            Client client = new Client
+            {
+                Id = reader.GetInt32(0),
+                Nom = reader.GetString(1),
+                Email = reader.GetString(2)
+            };
+
+            clients.Add(client);
+        }
+
+        return clients;
     }
 }

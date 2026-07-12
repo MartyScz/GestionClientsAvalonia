@@ -142,4 +142,31 @@ public partial class MainWindow : Window
         MessageTextBlock.Text = $"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.";
     }
 
+    private void SearchClient_Click(object? sender, RoutedEventArgs e)
+    {
+        string searchText = SearchTextBox.Text ?? "";
+
+        List<Client> searchResults;
+
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            searchResults = _clientRepository.GetAll();
+        }
+        else
+        {
+            searchResults = _clientRepository.Search(searchText);
+        }
+
+        ClientListBox.SelectedItem = null;
+
+        _clients.Clear();
+
+        foreach (Client client in searchResults)
+        {
+            _clients.Add(client);
+        }
+
+        MessageTextBlock.Text = $"{searchResults.Count} client(s) trouvé(s).";
+    }
+
 }
