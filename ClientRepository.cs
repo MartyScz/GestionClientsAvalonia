@@ -135,4 +135,23 @@ public class ClientRepository
 
         return clients;
     }
+
+    public bool EmailExists(string email)
+    {
+        using var connection = Database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = 
+        """
+        SELECT COUNT(*)
+        FROM Clients
+        WHERE Email = @email COLLATE NOCASE;
+        """;
+
+        command.Parameters.AddWithValue("@email", email.Trim());
+
+        long count = (long)command.ExecuteScalar()!;
+
+        return count > 0;
+    }
 }

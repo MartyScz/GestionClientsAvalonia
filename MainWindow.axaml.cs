@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
 using Avalonia.Platform.Storage;
+using System.ComponentModel;
+using System;
 
 namespace GestionClientsAvalonia;
 
@@ -199,6 +201,80 @@ public partial class MainWindow : Window
         CsvService.ExportClients(filePath, clients);
 
         MessageTextBlock.Text = $"{clients.Count} client(s) exporté(s) dans {file.Name}.";
+    }
+
+    private async void ImportClients_Click(object? sender, RoutedEventArgs e)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title = "Importer des clients",
+                AllowMultiple = false,
+
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("Fichiers CSV")
+                    {
+                        Patterns = ["*.csv"]
+                    }
+                ]
+            }
+        );
+
+        if (files.Count == 0)
+        {
+            MessageTextBlock.Text = "Import annulé.";
+            return;
+        }
+
+        string? filePath = files[0].TryGetLocalPath();
+
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            MessageTextBlock.Text = "Impossible de récupérer le chemin du fichier.";
+            return;
+        }
+
+        try
+        {
+            List<Client> clientsToImport = CsvService.ImportClients(filePath);
+
+            int importedCount =0;
+            int ignoredCount = 0;
+
+            foreach (Client client in clientsToImport)
+            {
+                if (_clientRepository.EmailExists(client.Email))
+                {
+                    ignoredCount++;
+                    continue;
+                }
+
+                client.Id = _clientRepository.Add(client);
+
+                importedCount++;
+            }
+
+            ClientListBox.SelectedItem = null;
+            SearchTextBox.Text = "";
+
+            _clients.Clear();
+
+            List<Client> allClients = _clientRepository.GetAll();
+
+            foreach (Client client in allClients)
+            {
+                _clients.Add(client);
+            }
+
+            MessageTextBlock.Text = 
+                $"Import terminé : {importedCount} client(s) ajouté(s), " +
+                $"{ignoredCount} doublon(s) ignoré(s).";
+        }
+        catch (InvalidOperationException ex)
+        {
+            MessageTextBlock.Text = ex.Message;
+        }
     }
 
 }
