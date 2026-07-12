@@ -20,6 +20,9 @@ Projet en cours de développement.
 - Fenêtre de confirmation avant la suppression
 - Création automatique de la base et de la table Clients
 - Recherche de clients par nom ou adresse email
+- Export des clients au format CSV
+- Import de clients depuis un fichier CSV
+- Détection et exclusion des doublons par adresse email lors de l'import
 
 ## Technologies utilisées
 
