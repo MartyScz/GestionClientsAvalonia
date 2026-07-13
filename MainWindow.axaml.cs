@@ -42,6 +42,17 @@ public partial class MainWindow : Window
             return;
         }
 
+
+        nom = nom.Trim();
+        email =email.Trim();
+
+        if (!EmailValidator.IsValid(email))
+        {
+            MessageTextBlock.Text = "L'adresse email n'est pas valide";
+
+            return;
+        }
+
         Client client = new Client
         {
             Nom = nom,
@@ -85,6 +96,15 @@ public partial class MainWindow : Window
         {
             MessageTextBlock.Text = "Le nom et l'email sont obligatoires.";
             return;
+        }
+
+        nom = nom.Trim();
+        email = email.Trim();
+
+        if (!EmailValidator.IsValid(email))
+        {
+            MessageTextBlock.Text = "L'adresse email n'est pas valide.";
+                return;
         }
 
         Client updateClient = new Client
@@ -239,11 +259,21 @@ public partial class MainWindow : Window
         {
             List<Client> clientsToImport = CsvService.ImportClients(filePath);
 
-            int importedCount =0;
+            int importedCount = 0;
             int ignoredCount = 0;
+            int invalidCount = 0;
 
             foreach (Client client in clientsToImport)
             {
+                client.Nom = client.Nom.Trim();
+                client.Email = client.Email.Trim();
+
+                if (!EmailValidator.IsValid(client.Email))
+                {
+                    invalidCount++;
+                    continue;
+                }
+
                 if (_clientRepository.EmailExists(client.Email))
                 {
                     ignoredCount++;
@@ -269,7 +299,8 @@ public partial class MainWindow : Window
 
             MessageTextBlock.Text = 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
-                $"{ignoredCount} doublon(s) ignoré(s).";
+                $"{ignoredCount} doublon(s) ignoré(s), " +
+                $"{invalidCount} adresse(s) invalide(s) ignorée(s)";
         }
         catch (InvalidOperationException ex)
         {
