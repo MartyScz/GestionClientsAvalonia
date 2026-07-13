@@ -7,6 +7,7 @@ using System.Data.Common;
 using Avalonia.Platform.Storage;
 using System.ComponentModel;
 using System;
+using Microsoft.Data.Sqlite;
 
 namespace GestionClientsAvalonia;
 
@@ -42,7 +43,6 @@ public partial class MainWindow : Window
             return;
         }
 
-
         nom = nom.Trim();
         email =email.Trim();
 
@@ -55,7 +55,7 @@ public partial class MainWindow : Window
 
         if (_clientRepository.EmailExists(email))
         {
-            MessageTextBlock.Text = "Un client possède déjà cette adresse mail.";
+            MessageTextBlock.Text = "Un client possède déjà cette adresse email.";
 
             return;
         }
@@ -66,7 +66,23 @@ public partial class MainWindow : Window
             Email = email
         };
 
-        client.Id = _clientRepository.Add(client);
+        try
+        {
+            client.Id = _clientRepository.Add(client);
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
+        {
+            MessageTextBlock.Text = "Impossible d'ajouter ce client : cette adresse email existe déjà";
+
+            return;
+        }
+        catch (SqliteException)
+        {
+            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'ajout.";
+            
+            return;
+        }
+
         _clients.Add(client);
 
         NomTextBox.Text = "";
@@ -116,7 +132,7 @@ public partial class MainWindow : Window
 
         if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
         {
-            MessageTextBlock.Text = "Un autre client possède déjà cette adresse mail";
+            MessageTextBlock.Text = "Un autre client possède déjà cette adresse email";
 
             return;
         }
