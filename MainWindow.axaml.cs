@@ -8,6 +8,7 @@ using Avalonia.Platform.Storage;
 using System.ComponentModel;
 using System;
 using Microsoft.Data.Sqlite;
+using System.IO;
 
 namespace GestionClientsAvalonia;
 
@@ -275,7 +276,21 @@ public partial class MainWindow : Window
 
         List<Client> clients = _clientRepository.GetAll();
 
-        CsvService.ExportClients(filePath, clients);
+        try
+        {
+            CsvService.ExportClients(filePath, clients);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            MessageTextBlock.Text = "L'accès au fichier a été refusé. Vérifie se permissions.";
+
+            return;
+        }
+        catch (IOException)
+        {
+            MessageTextBlock.Text = "Impossible d'écrire dans le fichier. Il est peut-être déjà ouvert.";
+        }
+
 
         MessageTextBlock.Text = $"{clients.Count} client(s) exporté(s) dans {file.Name}.";
     }
