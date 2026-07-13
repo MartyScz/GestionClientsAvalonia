@@ -378,6 +378,18 @@ public partial class MainWindow : Window
         {
             MessageTextBlock.Text = ex.Message;
         }
+        catch (UnauthorizedAccessException)
+        {
+            MessageTextBlock.Text = " L'accès au fichier a été refusé. Vérifie ses permissions.";
+        }
+        catch (IOException)
+        {
+            MessageTextBlock.Text = "Impossible de lire le fichier. Il est peut-être déjà utilisé.";
+        }
+        catch (SqliteException)
+        {
+            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'import";
+        }
     }
 
 }
