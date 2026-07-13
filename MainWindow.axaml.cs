@@ -79,7 +79,7 @@ public partial class MainWindow : Window
         catch (SqliteException)
         {
             MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'ajout.";
-            
+
             return;
         }
 
@@ -144,7 +144,24 @@ public partial class MainWindow : Window
             Email = email
         };
 
-        bool isUpdated = _clientRepository.Update(updateClient);
+        bool isUpdated;
+
+        try
+        {
+            isUpdated = _clientRepository.Update(updateClient);
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
+        {
+            MessageTextBlock.Text = "Impossible de modifier ce client : cette adresse mail existe déjà.";
+
+            return;
+        }
+        catch (SqliteException)
+        {
+            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant la modification.";
+
+            return;
+        }
 
         if (!isUpdated)
         {
@@ -222,7 +239,7 @@ public partial class MainWindow : Window
         MessageTextBlock.Text = $"{searchResults.Count} client(s) trouvé(s).";
     }
 
-    private async void ExportClients_Click( object? sender, RoutedEventArgs e)
+   private async void ExportClients_Click( object? sender, RoutedEventArgs e)
     {
         var file = await StorageProvider.SaveFilePickerAsync(
             new FilePickerSaveOptions
