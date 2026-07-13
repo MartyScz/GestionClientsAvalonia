@@ -196,7 +196,17 @@ public partial class MainWindow : Window
             return;
         }
 
-        bool isDeleted = _clientRepository.Delete(selectedClient.Id);
+        bool isDeleted;
+        try
+        {
+            isDeleted = _clientRepository.Delete(selectedClient.Id);
+        }
+        catch (SqliteException)
+        {
+            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant la suppression.";
+
+            return;
+        }
 
         if (!isDeleted)
         {
