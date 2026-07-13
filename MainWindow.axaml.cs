@@ -53,6 +53,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (_clientRepository.EmailExists(email))
+        {
+            MessageTextBlock.Text = "Un client possède déjà cette adresse mail.";
+
+            return;
+        }
+
         Client client = new Client
         {
             Nom = nom,
@@ -105,6 +112,13 @@ public partial class MainWindow : Window
         {
             MessageTextBlock.Text = "L'adresse email n'est pas valide.";
                 return;
+        }
+
+        if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
+        {
+            MessageTextBlock.Text = "Un autre client possède déjà cette adresse mail";
+
+            return;
         }
 
         Client updateClient = new Client

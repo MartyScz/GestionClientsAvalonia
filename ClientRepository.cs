@@ -1,6 +1,8 @@
 using Avalonia.Controls.Converters;
+using Avalonia.Remote.Protocol;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
+using System.Data.Common;
 
 
 namespace GestionClientsAvalonia;
@@ -154,4 +156,26 @@ public class ClientRepository
 
         return count > 0;
     }
+
+    public bool EmailExistsForAnotherClient(string email, int clientId)
+    {
+        using var connection = Database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText =
+        """
+        SELECT COUNT(*)
+        FROM Clients
+        WHERE Email = @email COLLATE NOCASE
+            AND Id != @id;
+        """;
+
+        command.Parameters.AddWithValue("@email", email.Trim());
+        command.Parameters.AddWithValue("@id", clientId);
+
+        long count = (long)command.ExecuteScalar()!;
+
+        return count > 0;
+    }
+
 }

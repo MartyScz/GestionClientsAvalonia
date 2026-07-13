@@ -30,5 +30,15 @@ public static class Database
         """;
 
         command.ExecuteNonQuery();
+
+        using var uniqueEmailCommand = connection.CreateCommand();
+
+        uniqueEmailCommand.CommandText = 
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS UX_Clients_Email_NoCase
+        ON Clients (Email COLLATE NOCASE);
+        """;
+
+        uniqueEmailCommand.ExecuteNonQuery();
     }
 }
