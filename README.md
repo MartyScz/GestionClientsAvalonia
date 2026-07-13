@@ -23,6 +23,7 @@ Projet en cours de développement.
 - Export des clients au format CSV
 - Import de clients depuis un fichier CSV
 - Détection et exclusion des doublons par adresse email lors de l'import
+- Validation du format des adresses email lors de l'ajout, de la modification et de l'import CSV
 
 ## Technologies utilisées
 
