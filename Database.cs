@@ -1,14 +1,60 @@
-using System.Threading;
+using System;
+using System.IO;
 using Microsoft.Data.Sqlite;
 
 namespace GestionClientsAvalonia;
 
 public static class Database
 {
-    private const string ConnectionString = "Data Source=GestionClient.db";
+    private static readonly string ApplicationFolder = 
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GestionClientsAvalonia");
+
+    private static readonly string DatabasePath = 
+        Path.Combine(ApplicationFolder, "GestionClient.db");
+
+    private static readonly string LegacyDatabasePath =
+        Path.GetFullPath("GestionClient.db");
+    
+    private static readonly string ConnectionString =
+        CreateConnectionString(DatabasePath);
+
+    private static string CreateConnectionString(string databasePath)
+    {
+        var builder = new SqliteConnectionStringBuilder
+        {
+            DataSource = databasePath
+        };
+
+        return builder.ToString();
+    }
+
+    private  static void PrepareDatabaseLocation(){
+        Directory.CreateDirectory(ApplicationFolder);
+
+        if (File.Exists(DatabasePath))
+        {
+            return;
+        }
+
+        if (!File.Exists(LegacyDatabasePath))
+        {
+            return;
+        }
+
+        using var sourceConnection = new SqliteConnection(CreateConnectionString(LegacyDatabasePath));
+
+        using var destinationConnection = new SqliteConnection(ConnectionString);
+
+        sourceConnection.Open();
+        destinationConnection.Open();
+
+        sourceConnection.BackupDatabase(destinationConnection);
+    }
 
     public static SqliteConnection OpenConnection()
     {
+        PrepareDatabaseLocation();
+
         SqliteConnection connection = new SqliteConnection(ConnectionString);
 
         connection.Open();
@@ -41,4 +87,5 @@ public static class Database
 
         uniqueEmailCommand.ExecuteNonQuery();
     }
+
 }
