@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System;
 using Microsoft.Data.Sqlite;
 using System.IO;
+using Avalonia.Remote.Protocol.Viewport;
 
 namespace GestionClientsAvalonia;
 
@@ -329,13 +330,15 @@ public partial class MainWindow : Window
 
         try
         {
-            List<Client> clientsToImport = CsvService.ImportClients(filePath);
+            List<Client> csvClients = CsvService.ImportClients(filePath);
 
             int importedCount = 0;
             int ignoredCount = 0;
             int invalidCount = 0;
 
-            foreach (Client client in clientsToImport)
+            List<Client> clientsToImport = new();
+
+            foreach (Client client in csvClients)
             {
                 client.Nom = client.Nom.Trim();
                 client.Email = client.Email.Trim();
@@ -352,9 +355,14 @@ public partial class MainWindow : Window
                     continue;
                 }
 
-                client.Id = _clientRepository.Add(client);
+                clientsToImport.Add(client);
+            }
 
-                importedCount++;
+            if (clientsToImport.Count > 0)
+            {
+                importedCount = _clientRepository.AddMany(clientsToImport);
+
+                ignoredCount += clientsToImport.Count - importedCount;
             }
 
             ClientListBox.SelectedItem = null;

@@ -1,8 +1,12 @@
 using Avalonia.Controls.Converters;
 using Avalonia.Remote.Protocol;
+using Avalonia.Remote.Protocol.Viewport;
 using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Net.Http.Headers;
 
 
 namespace GestionClientsAvalonia;
@@ -176,6 +180,46 @@ public class ClientRepository
         long count = (long)command.ExecuteScalar()!;
 
         return count > 0;
+    }
+
+    public int AddMany(List<Client> clients)
+    {
+        using var connection = Database.OpenConnection();
+        using var transaction = connection.BeginTransaction();
+
+        int importedCount = 0;
+
+        try
+        {
+            foreach (Client client in clients)
+            {
+                using var command = connection.CreateCommand();
+
+                command.Transaction = transaction;
+
+                command.CommandText = 
+                """
+                INSERT OR IGNORE INTO Clients (Nom, Email)
+                VALUES (@nom, @email);
+                """;
+
+                command.Parameters.AddWithValue("@nom", client.Nom);
+                command.Parameters.AddWithValue("@email", client.Email);
+
+                importedCount += command.ExecuteNonQuery();
+
+
+            }
+
+            transaction.Commit();
+
+            return importedCount;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
 }
