@@ -1,12 +1,5 @@
-using Avalonia.Controls.Converters;
-using Avalonia.Remote.Protocol;
-using Avalonia.Remote.Protocol.Viewport;
-using Microsoft.Data.Sqlite;
-using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Net.Http.Headers;
+
 
 
 namespace GestionClientsAvalonia;

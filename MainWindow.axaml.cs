@@ -46,7 +46,19 @@ public partial class MainWindow : Window
         }
 
         nom = nom.Trim();
-        email =email.Trim();
+        email = email.Trim();
+
+        if (nom.Length > ClientRules.MaxNameLength)
+        {
+            MessageTextBlock.Text = $"Le nom ne peut pas dépasser {ClientRules.MaxNameLength} caractères.";
+            return;
+        }
+
+        if (email.Length > ClientRules.MaxEmailLength)
+        {
+            MessageTextBlock.Text = $"L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caratères.";
+            return;
+        }
 
         if (!EmailValidator.IsValid(email))
         {
@@ -125,6 +137,18 @@ public partial class MainWindow : Window
 
         nom = nom.Trim();
         email = email.Trim();
+
+        if (nom.Length > ClientRules.MaxNameLength)
+        {
+            MessageTextBlock.Text = $"Le nom ne peut dépasser {ClientRules.MaxNameLength} caractères.";
+            return;
+        }
+
+        if (email.Length > ClientRules.MaxEmailLength)
+        {
+            MessageTextBlock.Text = $"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caratères.";
+            return;
+        }
 
         if (!EmailValidator.IsValid(email))
         {
@@ -335,6 +359,7 @@ public partial class MainWindow : Window
             int importedCount = 0;
             int ignoredCount = 0;
             int invalidCount = 0;
+            int tooLongCount = 0;
 
             List<Client> clientsToImport = new();
 
@@ -342,6 +367,12 @@ public partial class MainWindow : Window
             {
                 client.Nom = client.Nom.Trim();
                 client.Email = client.Email.Trim();
+
+                if (client.Nom.Length > ClientRules.MaxNameLength || client.Email.Length > ClientRules.MaxEmailLength)
+                {
+                    tooLongCount++;
+                    continue;
+                }
 
                 if (!EmailValidator.IsValid(client.Email))
                 {
@@ -380,7 +411,8 @@ public partial class MainWindow : Window
             MessageTextBlock.Text = 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
                 $"{ignoredCount} doublon(s) ignoré(s), " +
-                $"{invalidCount} adresse(s) invalide(s) ignorée(s)";
+                $"{invalidCount} adresse(s) invalide(s) ignorée(s)"+
+                $"{tooLongCount} ligne(s) trop longue(s) ignorée(s).";
         }
         catch (InvalidOperationException ex)
         {

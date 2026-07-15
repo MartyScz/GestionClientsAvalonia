@@ -6,6 +6,7 @@ namespace GestionClientsAvalonia;
 
 public static class Database
 {
+    private const int CurrentDatabaseVersion = 1;
     private static readonly string ApplicationFolder = 
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GestionClientsAvalonia");
 
@@ -64,28 +65,146 @@ public static class Database
 
     public static void Initialize(SqliteConnection connection)
     {
+        int version = GetDatabaseVersion(connection);
+
+        if (version > CurrentDatabaseVersion)
+        {
+            throw new InvalidOperationException(
+                "La base de données utilise une version plus récente que l'application."
+            );
+        }
+
+        if (version == 0)
+        {
+            if (ClientsTableExists(connection))
+            {
+                MigrateFromVersion0To1(connection);
+            }
+            else
+            {
+                CreateVersion1Schema(connection);
+            }
+        }
+    }
+
+    private static int GetDatabaseVersion(SqliteConnection connection)
+    {
+        using var command = connection.CreateCommand();
+
+        command.CommandText = "PRAGMA user_version";
+
+        object? result = command.ExecuteScalar();
+
+        return Convert.ToInt32(result);
+    }
+
+    private static void SetDatabaseVersion(SqliteConnection connection, SqliteTransaction transaction, int version)
+    {
+        using var command = connection.CreateCommand();
+
+        command.Transaction = transaction;
+        command.CommandText = $"PRAGMA user_version = {version};";
+
+        command.ExecuteNonQuery();
+    }
+
+    private static void MigrateFromVersion0To1(SqliteConnection connection)
+    {
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            using var command = connection.CreateCommand();
+
+            command.Transaction = transaction;
+
+            command.CommandText =
+            $"""
+            CREATE TABLE Clients_New (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Nom TEXT NOT NULL
+                    CHECK (length(Nom) <= {ClientRules.MaxNameLength}),
+                Email TEXT NOT NULL
+                    CHECK (length(Email) <= {ClientRules.MaxEmailLength})
+            );
+
+            INSERT INTO Clients_New (Id, Nom, Email)
+            SELECT Id, Nom, Email
+            FROM Clients;
+
+            DROP TABLE Clients;
+
+            ALTER TABLE Clients_New RENAME TO Clients;
+
+            CREATE UNIQUE INDEX UX_Clients_Email_NoCase
+            ON Clients (Email COLLATE NOCASE);
+            """;
+
+            command.ExecuteNonQuery();
+
+            SetDatabaseVersion(connection, transaction, 1);
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private static bool ClientsTableExists( SqliteConnection connection)
+    {
         using var command = connection.CreateCommand();
 
         command.CommandText =
         """
-        CREATE TABLE IF NOT EXISTS Clients (
+        SELECT COUNT(*)
+        FROM sqlite_master
+        WHERE type = 'table'
+            AND name = 'Clients'
+        """;
+
+        object? result = command.ExecuteScalar();
+
+        return Convert.ToInt32(result) > 0;
+    }
+
+    private static void CreateVersion1Schema( SqliteConnection connection)
+    {
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            using var command = connection.CreateCommand();
+
+            command.Transaction = transaction;
+
+            command.CommandText = 
+            $"""
+            CREATE TABLE Clients (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Nom TEXT NOT NULL,
+            Nom TEXT NOT NULL
+                CHECK (length(Nom) <= {ClientRules.MaxNameLength}),
             Email TEXT NOT NULL
-        );
-        """;
+                CHECK (length(Email) <= {ClientRules.MaxEmailLength})
+            );
 
-        command.ExecuteNonQuery();
+            CREATE UNIQUE INDEX UX_Clients_Email_NoCase
+            ON Clients (Email COLLATE NOCASE);
+            """;
 
-        using var uniqueEmailCommand = connection.CreateCommand();
+            command.ExecuteNonQuery();
 
-        uniqueEmailCommand.CommandText = 
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS UX_Clients_Email_NoCase
-        ON Clients (Email COLLATE NOCASE);
-        """;
+            SetDatabaseVersion(connection, transaction, 1);
 
-        uniqueEmailCommand.ExecuteNonQuery();
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
 }
