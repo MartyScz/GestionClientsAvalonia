@@ -32,6 +32,8 @@ public partial class MainWindow : Window
         {
             _clients.Add(client);
         }
+
+        UpdateClientCount();
     }
 
     private void NewClient_Click(object? sender, RoutedEventArgs e)
@@ -111,6 +113,7 @@ public partial class MainWindow : Window
         }
 
         _clients.Add(client);
+        UpdateClientCount();
 
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
@@ -170,7 +173,7 @@ public partial class MainWindow : Window
 
         if (email.Length > ClientRules.MaxEmailLength)
         {
-            MessageTextBlock.Text = $"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caratères.";
+            MessageTextBlock.Text = $"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caractères.";
             return;
         }
 
@@ -265,6 +268,7 @@ public partial class MainWindow : Window
         }
 
         _clients.Remove(selectedClient);
+        UpdateClientCount();
 
         NomTextBox.Text ="";
         EmailTextBox.Text ="";
@@ -296,6 +300,7 @@ public partial class MainWindow : Window
             _clients.Add(client);
         }
 
+        UpdateClientCount();
         MessageTextBlock.Text = $"{searchResults.Count} client(s) trouvé(s).";
     }
 
@@ -431,11 +436,12 @@ public partial class MainWindow : Window
             {
                 _clients.Add(client);
             }
+            UpdateClientCount();
 
             MessageTextBlock.Text = 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
                 $"{ignoredCount} doublon(s) ignoré(s), " +
-                $"{invalidCount} adresse(s) invalide(s) ignorée(s)"+
+                $"{invalidCount} adresse(s) invalide(s) ignorée(s) "+
                 $"{tooLongCount} ligne(s) trop longue(s) ignorée(s).";
         }
         catch (InvalidOperationException ex)
@@ -454,6 +460,11 @@ public partial class MainWindow : Window
         {
             MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'import";
         }
+    }
+
+    private void UpdateClientCount()
+    {
+        ClientCountTextBlock.Text = $"{_clients.Count} client(s) affiché(s).";
     }
 
 }
