@@ -21,6 +21,23 @@
                 <TextBox x:Name="SearchTextBox" Grid.Column="0" PlaceholderText="Rechercher par Nom ou Email" />
                 <Button Grid.Column="1" Content="Rechercher" Click="SearchClient_Click" />
             </Grid>
+            <Grid
+                ColumnDefinitions="60,180,*"
+                ColumnSpacing="15"
+                Margin="8,10,8,5">
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Id"
+                    FontWeight="Bold"/>
+                <TextBlock
+                    Grid.Column="1"
+                    Text="Nom"
+                    FontWeight="Bold"/>
+                <TextBlock
+                    Grid.Column="2"
+                    Text="Email"
+                    FontWeight="Bold"/>
+            </Grid>
             <ListBox x:Name="ClientListBox" Height="150" SelectionChanged="ClientListBox_SelectionChanged" >
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:Client">
