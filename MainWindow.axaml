@@ -10,9 +10,10 @@
             <TextBlock Text="Gestion Clients" FontSize="28" />
             <TextBox x:Name="NomTextBox" PlaceholderText="Nom du client" />
             <TextBox x:Name="EmailTextBox" PlaceholderText="Email du client" />
+            <Button Content="Nouveau / Vider" Click="NewClient_Click" />
             <Button Content="Ajouter" Click="AddClient_Click"/>
-            <Button Content="Modifier" Click="UpdateClient_Click" />
-            <Button Content="Supprimer" Click="DeleteClient_Click" />
+            <Button x:Name="UpdateButton" Content="Modifier" Click="UpdateClient_Click" IsEnabled="False" />
+            <Button x:Name="DeleteButton" Content="Supprimer" Click="DeleteClient_Click" IsEnabled="False" />
             <Button Content="Exporter CSV" Click="ExportClients_Click" />
             <Button Content="Importer CSV" Click="ImportClients_Click" />
             <TextBlock x:Name="MessageTextBlock" />

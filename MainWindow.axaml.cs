@@ -34,6 +34,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private void NewClient_Click(object? sender, RoutedEventArgs e)
+    {
+        ClientListBox.SelectedItem = null;
+        UpdateActionButtons();
+
+        NomTextBox.Text = "";
+        EmailTextBox.Text = "";
+
+        MessageTextBlock.Text = "Tu peux saisir un nouveau client.";
+
+        NomTextBox.Focus();
+    }
+
     private void AddClient_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         string nom = NomTextBox.Text ?? "";
@@ -107,15 +120,26 @@ public partial class MainWindow : Window
 
     private void ClientListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        UpdateActionButtons();
+
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
             return;
         }
 
+
         NomTextBox.Text = selectedClient.Nom;
         EmailTextBox.Text = selectedClient.Email;
 
         MessageTextBlock.Text = $"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}";
+    }
+
+    private void UpdateActionButtons()
+    {
+        bool isClientSelected = ClientListBox.SelectedItem is Client;
+
+        UpdateButton.IsEnabled = isClientSelected;
+        DeleteButton.IsEnabled = isClientSelected;
     }
 
     private void UpdateClient_Click(object? sender, RoutedEventArgs e)
