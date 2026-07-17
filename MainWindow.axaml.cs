@@ -1,22 +1,26 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Selection;
 using Avalonia.Interactivity;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using Avalonia.Platform.Storage;
-using System.ComponentModel;
 using System;
 using Microsoft.Data.Sqlite;
 using System.IO;
-using Avalonia.Remote.Protocol.Viewport;
+using Avalonia.Media;
 
 namespace GestionClientsAvalonia;
+
 
 public partial class MainWindow : Window
 {
     private readonly ObservableCollection<Client> _clients = new();
     private readonly ClientRepository _clientRepository = new();
+    private enum MessageType
+    {
+        Information,
+        Success,
+        Error
+    }
 
     public MainWindow()
     {
@@ -36,6 +40,18 @@ public partial class MainWindow : Window
         UpdateClientCount();
     }
 
+    private void ShowMessage(string message, MessageType messageType)
+    {
+        MessageTextBlock.Text = message;
+
+        MessageTextBlock.Foreground = messageType switch
+        {
+            MessageType.Success => Brushes.LightGreen,
+            MessageType.Error => Brushes.LightCoral,
+            _ => Brushes.LightSkyBlue
+        };
+    }
+
     private void NewClient_Click(object? sender, RoutedEventArgs e)
     {
         ClientListBox.SelectedItem = null;
@@ -44,7 +60,7 @@ public partial class MainWindow : Window
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
 
-        MessageTextBlock.Text = "Tu peux saisir un nouveau client.";
+        ShowMessage("Tu peux saisir un nouveau client.", MessageType.Information);
 
         NomTextBox.Focus();
     }
@@ -56,7 +72,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(nom) || string.IsNullOrWhiteSpace(email))
         {
-            MessageTextBlock.Text = "Le nom et l'email sont obligatoires.";
+            ShowMessage("Le nom et l'email sont obligatoires.", MessageType.Error);
             return;
         }
 
@@ -65,26 +81,26 @@ public partial class MainWindow : Window
 
         if (nom.Length > ClientRules.MaxNameLength)
         {
-            MessageTextBlock.Text = $"Le nom ne peut pas dépasser {ClientRules.MaxNameLength} caractères.";
+            ShowMessage($"Le nom ne peut pas dépasser {ClientRules.MaxNameLength} caractères.", MessageType.Error);
             return;
         }
 
         if (email.Length > ClientRules.MaxEmailLength)
         {
-            MessageTextBlock.Text = $"L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caratères.";
+            ShowMessage("L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caratères.", MessageType.Error);
             return;
         }
 
         if (!EmailValidator.IsValid(email))
         {
-            MessageTextBlock.Text = "L'adresse email n'est pas valide";
+            ShowMessage("L'adresse email n'est pas valide", MessageType.Error);
 
             return;
         }
 
         if (_clientRepository.EmailExists(email))
         {
-            MessageTextBlock.Text = "Un client possède déjà cette adresse email.";
+            ShowMessage("Un client possède déjà cette adresse email.", MessageType.Error);
 
             return;
         }
@@ -101,13 +117,13 @@ public partial class MainWindow : Window
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
         {
-            MessageTextBlock.Text = "Impossible d'ajouter ce client : cette adresse email existe déjà";
+            ShowMessage("Impossible d'ajouter ce client : cette adresse email existe déjà", MessageType.Error);
 
             return;
         }
         catch (SqliteException)
         {
-            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'ajout.";
+            ShowMessage("Une erreur de base de données est survenue pendant l'ajout.", MessageType.Error);
 
             return;
         }
@@ -118,7 +134,7 @@ public partial class MainWindow : Window
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
 
-        MessageTextBlock.Text = $"Client enregistré : Id : {client.Id} | Nom : {nom} | Email : {email}";
+       ShowMessage($"Client enregistré : Id : {client.Id} | Nom : {nom} | Email : {email}", MessageType.Success);
     }
 
     private void ClientListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -134,7 +150,7 @@ public partial class MainWindow : Window
         NomTextBox.Text = selectedClient.Nom;
         EmailTextBox.Text = selectedClient.Email;
 
-        MessageTextBlock.Text = $"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}";
+        ShowMessage($"Client sélectionné : Id {selectedClient.Id} | Nom : {selectedClient.Nom} | Email : {selectedClient.Email}", MessageType.Information);
     }
 
     private void UpdateActionButtons()
@@ -149,7 +165,7 @@ public partial class MainWindow : Window
     {
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
-            MessageTextBlock.Text = "Sélectionne un client à modifier.";
+            ShowMessage("Sélectionne un client à modifier.", MessageType.Information);
             return;
         }
 
@@ -158,7 +174,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(nom) || string.IsNullOrWhiteSpace(email))
         {
-            MessageTextBlock.Text = "Le nom et l'email sont obligatoires.";
+            ShowMessage("Le nom et l'email sont obligatoires.", MessageType.Error);
             return;
         }
 
@@ -167,25 +183,25 @@ public partial class MainWindow : Window
 
         if (nom.Length > ClientRules.MaxNameLength)
         {
-            MessageTextBlock.Text = $"Le nom ne peut dépasser {ClientRules.MaxNameLength} caractères.";
+            ShowMessage($"Le nom ne peut dépasser {ClientRules.MaxNameLength} caractères.", MessageType.Error);
             return;
         }
 
         if (email.Length > ClientRules.MaxEmailLength)
         {
-            MessageTextBlock.Text = $"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caractères.";
+            ShowMessage($"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caractères.", MessageType.Error);
             return;
         }
 
         if (!EmailValidator.IsValid(email))
         {
-            MessageTextBlock.Text = "L'adresse email n'est pas valide.";
+            ShowMessage("L'adresse email n'est pas valide.", MessageType.Error);
                 return;
         }
 
         if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
         {
-            MessageTextBlock.Text = "Un autre client possède déjà cette adresse email";
+            ShowMessage("Un autre client possède déjà cette adresse email", MessageType.Error);
 
             return;
         }
@@ -205,20 +221,20 @@ public partial class MainWindow : Window
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
         {
-            MessageTextBlock.Text = "Impossible de modifier ce client : cette adresse mail existe déjà.";
+            ShowMessage("Impossible de modifier ce client : cette adresse mail existe déjà.", MessageType.Error);
 
             return;
         }
         catch (SqliteException)
         {
-            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant la modification.";
+            ShowMessage("Une erreur de base de données est survenue pendant la modification.", MessageType.Error);
 
             return;
         }
 
         if (!isUpdated)
         {
-            MessageTextBlock.Text = " Le client n'a pas été trouvé dans la base.";
+            ShowMessage(" Le client n'a pas été trouvé dans la base.", MessageType.Error);
             return;
         }
 
@@ -228,14 +244,14 @@ public partial class MainWindow : Window
 
         ClientListBox.SelectedItem = updateClient;
 
-        MessageTextBlock.Text = $"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}";
+        ShowMessage($"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}", MessageType.Information);
     }
 
     private async void DeleteClient_Click(object? sender, RoutedEventArgs e)
     {
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
-            MessageTextBlock.Text = "Sélectionne un client à supprimer.";
+            ShowMessage("Sélectionne un client à supprimer.", MessageType.Information);
             return;
         }
 
@@ -245,7 +261,7 @@ public partial class MainWindow : Window
 
         if (!isConfirmed)
         {
-            MessageTextBlock.Text = "Suppression annulée.";
+            ShowMessage("Suppression annulée.", MessageType.Information);
             return;
         }
 
@@ -256,14 +272,14 @@ public partial class MainWindow : Window
         }
         catch (SqliteException)
         {
-            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant la suppression.";
+            ShowMessage("Une erreur de base de données est survenue pendant la suppression.", MessageType.Error);
 
             return;
         }
 
         if (!isDeleted)
         {
-            MessageTextBlock.Text = "Le client n'a pas été trouvé dans la base.";
+            ShowMessage("Le client n'a pas été trouvé dans la base.", MessageType.Error);
             return;
         }
 
@@ -273,7 +289,7 @@ public partial class MainWindow : Window
         NomTextBox.Text ="";
         EmailTextBox.Text ="";
 
-        MessageTextBlock.Text = $"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.";
+        ShowMessage($"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.", MessageType.Information);
     }
 
     private void SearchClient_Click(object? sender, RoutedEventArgs e)
@@ -301,7 +317,7 @@ public partial class MainWindow : Window
         }
 
         UpdateClientCount();
-        MessageTextBlock.Text = $"{searchResults.Count} client(s) trouvé(s).";
+        ShowMessage($"{searchResults.Count} client(s) trouvé(s).", MessageType.Information);
     }
 
    private async void ExportClients_Click( object? sender, RoutedEventArgs e)
@@ -316,7 +332,7 @@ public partial class MainWindow : Window
 
         if (file is null)
         {
-            MessageTextBlock.Text = "Export annulé.";
+            ShowMessage("Export annulé.", MessageType.Information);
             return;
         }
 
@@ -324,7 +340,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
-            MessageTextBlock.Text = "Impossible de récupérer le chemin du fichier.";
+            ShowMessage("Impossible de récupérer le chemin du fichier.", MessageType.Error);
             return;
         }
 
@@ -336,17 +352,17 @@ public partial class MainWindow : Window
         }
         catch (UnauthorizedAccessException)
         {
-            MessageTextBlock.Text = "L'accès au fichier a été refusé. Vérifie se permissions.";
+            ShowMessage("L'accès au fichier a été refusé. Vérifie se permissions.", MessageType.Error);
 
             return;
         }
         catch (IOException)
         {
-            MessageTextBlock.Text = "Impossible d'écrire dans le fichier. Il est peut-être déjà ouvert.";
+            ShowMessage("Impossible d'écrire dans le fichier. Il est peut-être déjà ouvert.", MessageType.Error);
         }
 
 
-        MessageTextBlock.Text = $"{clients.Count} client(s) exporté(s) dans {file.Name}.";
+        ShowMessage($"{clients.Count} client(s) exporté(s) dans {file.Name}.", MessageType.Information);
     }
 
     private async void ImportClients_Click(object? sender, RoutedEventArgs e)
@@ -369,7 +385,7 @@ public partial class MainWindow : Window
 
         if (files.Count == 0)
         {
-            MessageTextBlock.Text = "Import annulé.";
+            ShowMessage("Import annulé.", MessageType.Information);
             return;
         }
 
@@ -377,7 +393,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
-            MessageTextBlock.Text = "Impossible de récupérer le chemin du fichier.";
+            ShowMessage("Impossible de récupérer le chemin du fichier.", MessageType.Error);
             return;
         }
 
@@ -438,27 +454,27 @@ public partial class MainWindow : Window
             }
             UpdateClientCount();
 
-            MessageTextBlock.Text = 
+            ShowMessage( 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
                 $"{ignoredCount} doublon(s) ignoré(s), " +
                 $"{invalidCount} adresse(s) invalide(s) ignorée(s) "+
-                $"{tooLongCount} ligne(s) trop longue(s) ignorée(s).";
+                $"{tooLongCount} ligne(s) trop longue(s) ignorée(s).", MessageType.Information);
         }
         catch (InvalidOperationException ex)
         {
-            MessageTextBlock.Text = ex.Message;
+            ShowMessage(ex.Message, MessageType.Error);
         }
         catch (UnauthorizedAccessException)
         {
-            MessageTextBlock.Text = " L'accès au fichier a été refusé. Vérifie ses permissions.";
+            ShowMessage(" L'accès au fichier a été refusé. Vérifie ses permissions.", MessageType.Error);
         }
         catch (IOException)
         {
-            MessageTextBlock.Text = "Impossible de lire le fichier. Il est peut-être déjà utilisé.";
+            ShowMessage("Impossible de lire le fichier. Il est peut-être déjà utilisé.", MessageType.Error);
         }
         catch (SqliteException)
         {
-            MessageTextBlock.Text = "Une erreur de base de données est survenue pendant l'import";
+            ShowMessage("Une erreur de base de données est survenue pendant l'import", MessageType.Error);
         }
     }
 
