@@ -581,4 +581,39 @@ public partial class MainWindow : Window
         return false;
     }
 
+    private void SearchTextBox_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (!_isDatabaseAvailable)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
+        {
+            return;
+        }
+
+        try
+        {
+            List<Client> allClients = _clientRepository.GetAll();
+
+            ClientListBox.SelectedItem = null;
+
+            _clients.Clear();
+
+            foreach (Client client in allClients)
+            {
+                _clients.Add(client);
+            }
+
+            UpdateClientCount();
+
+            ShowMessage("Tous les clients sont de nouveau affichés.", MessageType.Information);
+        }
+        catch (SqliteException)
+        {
+            ShowMessage("Impossible de recharger la liste des clients.", MessageType.Error);
+        }
+    }
+
 }

@@ -114,7 +114,8 @@
             <TextBox
                 x:Name="SearchTextBox"
                 Grid.Column="0"
-                PlaceholderText="Rechercher par nom ou email" />
+                PlaceholderText="Rechercher par nom ou email"
+                TextChanged="SearchTextBox_TextChanged" />
 
             <Button
                 x:Name="SearchButton"
