@@ -59,10 +59,12 @@
                     Spacing="10">
 
                     <Button
+                        x:Name="NewButton"
                         Content="Nouveau / Vider"
                         Click="NewClient_Click" />
 
                     <Button
+                        x:Name="AddButton"
                         Content="Ajouter"
                         Click="AddClient_Click" />
 
@@ -86,10 +88,12 @@
                     Spacing="10">
 
                     <Button
+                        x:Name="ExportButton"
                         Content="Exporter CSV"
                         Click="ExportClients_Click" />
 
                     <Button
+                        x:Name="ImportButton"
                         Content="Importer CSV"
                         Click="ImportClients_Click" />
 
@@ -113,6 +117,7 @@
                 PlaceholderText="Rechercher par nom ou email" />
 
             <Button
+                x:Name="SearchButton"
                 Grid.Column="1"
                 Content="Rechercher"
                 Click="SearchClient_Click" />

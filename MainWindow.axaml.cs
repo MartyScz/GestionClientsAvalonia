@@ -15,6 +15,9 @@ public partial class MainWindow : Window
 {
     private readonly ObservableCollection<Client> _clients = new();
     private readonly ClientRepository _clientRepository = new();
+
+    private bool _isDatabaseAvailable;
+
     private enum MessageType
     {
         Information,
@@ -26,18 +29,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        using var connection = Database.OpenConnection();
-        Database.Initialize(connection);
         ClientListBox.ItemsSource = _clients;
 
-        List<Client> clientsFromDatabase = _clientRepository.GetAll();
+        _isDatabaseAvailable = TryLoadApplicationData();
 
-        foreach (Client client in clientsFromDatabase)
-        {
-            _clients.Add(client);
-        }
-
-        UpdateClientCount();
+        UpdateDatabaseControls();
     }
 
     private void ShowMessage(string message, MessageType messageType)
@@ -67,6 +63,11 @@ public partial class MainWindow : Window
 
     private void AddClient_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         string nom = NomTextBox.Text ?? "";
         string email = EmailTextBox.Text ?? "";
 
@@ -155,14 +156,19 @@ public partial class MainWindow : Window
 
     private void UpdateActionButtons()
     {
-        bool isClientSelected = ClientListBox.SelectedItem is Client;
+        bool canEditSelectedClient = _isDatabaseAvailable && ClientListBox.SelectedItem is Client;
 
-        UpdateButton.IsEnabled = isClientSelected;
-        DeleteButton.IsEnabled = isClientSelected;
+        UpdateButton.IsEnabled = canEditSelectedClient;
+        DeleteButton.IsEnabled = canEditSelectedClient;
     }
 
     private void UpdateClient_Click(object? sender, RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
             ShowMessage("Sélectionne un client à modifier.", MessageType.Information);
@@ -249,6 +255,11 @@ public partial class MainWindow : Window
 
     private async void DeleteClient_Click(object? sender, RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         if (ClientListBox.SelectedItem is not Client selectedClient)
         {
             ShowMessage("Sélectionne un client à supprimer.", MessageType.Information);
@@ -294,6 +305,11 @@ public partial class MainWindow : Window
 
     private void SearchClient_Click(object? sender, RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         string searchText = SearchTextBox.Text ?? "";
 
         List<Client> searchResults;
@@ -322,6 +338,11 @@ public partial class MainWindow : Window
 
    private async void ExportClients_Click( object? sender, RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         var file = await StorageProvider.SaveFilePickerAsync(
             new FilePickerSaveOptions
             {
@@ -367,6 +388,11 @@ public partial class MainWindow : Window
 
     private async void ImportClients_Click(object? sender, RoutedEventArgs e)
     {
+        if (!EnsureDatabaseAvailable())
+        {
+            return;
+        }
+
         var files = await StorageProvider.OpenFilePickerAsync(
             new FilePickerOpenOptions
             {
@@ -481,6 +507,78 @@ public partial class MainWindow : Window
     private void UpdateClientCount()
     {
         ClientCountTextBlock.Text = $"{_clients.Count} client(s) affiché(s).";
+    }
+
+    private bool TryLoadApplicationData()
+    {
+        try
+        {
+            using var connection = Database.OpenConnection();
+
+            List<Client> clientsFromDatabase = _clientRepository.GetAll();
+
+            foreach (Client client in clientsFromDatabase)
+            {
+                _clients.Add(client);
+            }
+
+            UpdateClientCount();
+
+            return true;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            ShowMessage("L'accès au dossier de données a été refusé.", MessageType.Error);
+        
+            return false;
+        }
+        catch (IOException)
+        {
+            ShowMessage("Impossible d'accéder aux fichiers de l'application.", MessageType.Error);
+
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            ShowMessage(ex.Message, MessageType.Error);
+
+            return false;
+        }
+        catch (SqliteException)
+        {
+            ShowMessage("Impossible d'ouvrir ou d'initialiser la base de données.", MessageType.Error);
+
+            return false;
+        }
+    }
+
+    private void UpdateDatabaseControls()
+    {
+        NewButton.IsEnabled = _isDatabaseAvailable;
+        AddButton.IsEnabled = _isDatabaseAvailable;
+        ExportButton.IsEnabled = _isDatabaseAvailable;
+        ImportButton.IsEnabled = _isDatabaseAvailable;
+        SearchButton.IsEnabled = _isDatabaseAvailable;
+
+        NomTextBox.IsEnabled = _isDatabaseAvailable;        
+        EmailTextBox.IsEnabled = _isDatabaseAvailable;        
+        SearchTextBox.IsEnabled = _isDatabaseAvailable;
+        ClientListBox.IsEnabled = _isDatabaseAvailable;
+
+        UpdateActionButtons();
+
+    }
+
+    private bool EnsureDatabaseAvailable()
+    {
+        if (_isDatabaseAvailable)
+        {
+            return true;
+        }
+
+        ShowMessage("La base de données n'est pas disponible. Rétablis son accès puis redémarre l'application.", MessageType.Error);
+
+        return false;
     }
 
 }
