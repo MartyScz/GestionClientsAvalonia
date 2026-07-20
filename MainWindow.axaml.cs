@@ -488,19 +488,27 @@ public partial class MainWindow : Window
         }
         catch (InvalidOperationException ex)
         {
+            AppLogger.LogError("Import CSV - validation ou lecture du contenu", ex);
+
             ShowMessage(ex.Message, MessageType.Error);
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
-            ShowMessage(" L'accès au fichier a été refusé. Vérifie ses permissions.", MessageType.Error);
+            AppLogger.LogError("Import CSV - accès refusé au fichier", ex);
+
+            ShowMessage("L'accès au fichier a été refusé. Vérifie ses permissions.", MessageType.Error);
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            AppLogger.LogError("Import CSV - lecture du fichier", ex);
+
             ShowMessage("Impossible de lire le fichier. Il est peut-être déjà utilisé.", MessageType.Error);
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
-            ShowMessage("Une erreur de base de données est survenue pendant l'import", MessageType.Error);
+            AppLogger.LogError("Import CSV - écriture dans la base de données", ex);
+
+            ShowMessage("Une erreur de base de données est survenue pendant l'import.", MessageType.Error);
         }
     }
 
