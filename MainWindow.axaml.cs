@@ -528,26 +528,34 @@ public partial class MainWindow : Window
 
             return true;
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
+            AppLogger.LogError("Accès refusé au dossier de données pendant le démarrage", ex);
+
             ShowMessage("L'accès au dossier de données a été refusé.", MessageType.Error);
         
             return false;
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            AppLogger.LogError("Accès aux fichiers de l'application pendant le démarrage", ex);
+
             ShowMessage("Impossible d'accéder aux fichiers de l'application.", MessageType.Error);
 
             return false;
         }
         catch (InvalidOperationException ex)
         {
+            AppLogger.LogError("Vérification de la version de la base de données", ex);
+
             ShowMessage(ex.Message, MessageType.Error);
 
             return false;
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
+            AppLogger.LogError("Ouverture ou initialisation de la base de données", ex);
+
             ShowMessage("Impossible d'ouvrir ou d'initialiser la base de données.", MessageType.Error);
 
             return false;
