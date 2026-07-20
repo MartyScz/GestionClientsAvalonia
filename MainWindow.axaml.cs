@@ -515,6 +515,8 @@ public partial class MainWindow : Window
         {
             using var connection = Database.OpenConnection();
 
+            Database.Initialize(connection);
+
             List<Client> clientsFromDatabase = _clientRepository.GetAll();
 
             foreach (Client client in clientsFromDatabase)
