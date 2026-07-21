@@ -283,7 +283,7 @@ public partial class MainWindow : Window
         }
 
         bool isDeleted;
-        
+
         try
         {
             isDeleted = _clientRepository.Delete(selectedClient.Id);
@@ -323,13 +323,25 @@ public partial class MainWindow : Window
 
         List<Client> searchResults;
 
-        if (string.IsNullOrWhiteSpace(searchText))
+        try
         {
-            searchResults = _clientRepository.GetAll();
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                searchResults = _clientRepository.GetAll();
+            }
+            else
+            {
+                searchResults = _clientRepository.Search(searchText);
+            }
+            
         }
-        else
+        catch (SqliteException ex)
         {
-            searchResults = _clientRepository.Search(searchText);
+            AppLogger.LogError("Recherche de clients - lecture dans la base de données", ex);
+            
+            ShowMessage("Une erreur de base de données est survenue pendant la recherche.", MessageType.Error);
+
+            return;
         }
 
         ClientListBox.SelectedItem = null;
