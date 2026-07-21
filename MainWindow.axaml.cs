@@ -208,12 +208,6 @@ public partial class MainWindow : Window
                 return;
         }
 
-        if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
-        {
-            ShowMessage("Un autre client possède déjà cette adresse email", MessageType.Error);
-
-            return;
-        }
 
         Client updateClient = new Client
         {
@@ -226,6 +220,13 @@ public partial class MainWindow : Window
 
         try
         {
+            if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
+            {
+                ShowMessage("Un autre client possède déjà cette adresse email", MessageType.Error);
+
+                return;
+            }
+
             isUpdated = _clientRepository.Update(updateClient);
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
@@ -234,8 +235,10 @@ public partial class MainWindow : Window
 
             return;
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
+            AppLogger.LogError("Modification d'un client - vérification ou mise à jour dans la base de données", ex);
+
             ShowMessage("Une erreur de base de données est survenue pendant la modification.", MessageType.Error);
 
             return;
@@ -243,13 +246,13 @@ public partial class MainWindow : Window
 
         if (!isUpdated)
         {
-            ShowMessage(" Le client n'a pas été trouvé dans la base.", MessageType.Error);
+            ShowMessage("Le client n'a pas été trouvé dans la base.", MessageType.Error);
             return;
         }
 
-        int SelectedIndex = ClientListBox.SelectedIndex;
+        int selectedIndex = ClientListBox.SelectedIndex;
 
-        _clients[SelectedIndex] = updateClient;
+        _clients[selectedIndex] = updateClient;
 
         ClientListBox.SelectedItem = updateClient;
 
@@ -275,7 +278,7 @@ public partial class MainWindow : Window
 
         if (!isConfirmed)
         {
-            ShowMessage("Suppression annulée.", MessageType.Information);
+            ShowMessage("Suppression +.", MessageType.Information);
             return;
         }
 
