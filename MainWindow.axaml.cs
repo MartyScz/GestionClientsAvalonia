@@ -88,7 +88,7 @@ public partial class MainWindow : Window
 
         if (email.Length > ClientRules.MaxEmailLength)
         {
-            ShowMessage("L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caratères.", MessageType.Error);
+            ShowMessage($"L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caractères.", MessageType.Error);
             return;
         }
 
@@ -99,12 +99,6 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_clientRepository.EmailExists(email))
-        {
-            ShowMessage("Un client possède déjà cette adresse email.", MessageType.Error);
-
-            return;
-        }
 
         Client client = new Client
         {
@@ -114,16 +108,25 @@ public partial class MainWindow : Window
 
         try
         {
+            if (_clientRepository.EmailExists(email))
+            {
+                ShowMessage("Un client possède déjà cette adresse email.", MessageType.Error);
+
+                return;
+            }
+
             client.Id = _clientRepository.Add(client);
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
         {
-            ShowMessage("Impossible d'ajouter ce client : cette adresse email existe déjà", MessageType.Error);
+            ShowMessage("Impossible d'ajouter ce client : cette adresse email existe déjà.", MessageType.Error);
 
             return;
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
+            AppLogger.LogError("Ajout d'un client - vérification ou insertion dans la base de données", ex);
+
             ShowMessage("Une erreur de base de données est survenue pendant l'ajout.", MessageType.Error);
 
             return;
