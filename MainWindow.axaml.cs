@@ -278,17 +278,20 @@ public partial class MainWindow : Window
 
         if (!isConfirmed)
         {
-            ShowMessage("Suppression +.", MessageType.Information);
+            ShowMessage("Suppression annulée.", MessageType.Information);
             return;
         }
 
         bool isDeleted;
+        
         try
         {
             isDeleted = _clientRepository.Delete(selectedClient.Id);
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
+            AppLogger.LogError("Suppression d'un client - suppression dans la base de données", ex);
+            
             ShowMessage("Une erreur de base de données est survenue pendant la suppression.", MessageType.Error);
 
             return;
@@ -303,8 +306,8 @@ public partial class MainWindow : Window
         _clients.Remove(selectedClient);
         UpdateClientCount();
 
-        NomTextBox.Text ="";
-        EmailTextBox.Text ="";
+        NomTextBox.Text = "";
+        EmailTextBox.Text = "";
 
         ShowMessage($"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.", MessageType.Information);
     }
