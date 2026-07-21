@@ -365,25 +365,37 @@ public partial class MainWindow : Window
             return;
         }
 
-        List<Client> clients = _clientRepository.GetAll();
 
         try
         {
+            List<Client> clients = _clientRepository.GetAll();
+
             CsvService.ExportClients(filePath, clients);
+
+            ShowMessage($"{clients.Count} client(s) exporté(s) dans {file.Name}.", MessageType.Information);
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
-            ShowMessage("L'accès au fichier a été refusé. Vérifie se permissions.", MessageType.Error);
+            AppLogger.LogError("Export CSV - accès  refusé au fichier", ex);
+
+            ShowMessage("L'accès au fichier a été refusé. Vérifie ses permissions.", MessageType.Error);
 
             return;
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            AppLogger.LogError("Export CSV - écriture dans le fichier", ex);
+
             ShowMessage("Impossible d'écrire dans le fichier. Il est peut-être déjà ouvert.", MessageType.Error);
+        }
+        catch (SqliteException ex)
+        {
+            AppLogger.LogError("Export CSV - lecture des clients dans la base de données", ex);
+
+            ShowMessage("Une erreur de base de données est survenue pendant l'export", MessageType.Error);
         }
 
 
-        ShowMessage($"{clients.Count} client(s) exporté(s) dans {file.Name}.", MessageType.Information);
     }
 
     private async void ImportClients_Click(object? sender, RoutedEventArgs e)
