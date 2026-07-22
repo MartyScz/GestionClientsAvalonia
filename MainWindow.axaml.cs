@@ -644,27 +644,33 @@ public partial class MainWindow : Window
             return;
         }
 
+        List<Client> allClients;
+
         try
         {
-            List<Client> allClients = _clientRepository.GetAll();
-
-            ClientListBox.SelectedItem = null;
-
-            _clients.Clear();
-
-            foreach (Client client in allClients)
-            {
-                _clients.Add(client);
-            }
-
-            UpdateClientCount();
-
-            ShowMessage("Tous les clients sont de nouveau affichés.", MessageType.Information);
+            allClients = _clientRepository.GetAll();
         }
-        catch (SqliteException)
+        catch (SqliteException ex)
         {
+            AppLogger.LogError("Rechargement automatique des clients - lecture dans la base de données", ex);
+
             ShowMessage("Impossible de recharger la liste des clients.", MessageType.Error);
+
+            return;
         }
+
+        ClientListBox.SelectedItem = null;
+
+        _clients.Clear();
+
+        foreach (Client client in allClients)
+        {
+            _clients.Add(client);
+        }
+
+        UpdateClientCount();
+
+        ShowMessage("Tous les clients sont de nouveau affichés.", MessageType.Information);
     }
 
 }
