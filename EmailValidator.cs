@@ -1,6 +1,5 @@
 using System;
 using System.Net.Mail;
-using Avalonia.Controls.Embedding.Offscreen;
 
 namespace GestionClientsAvalonia;
 
