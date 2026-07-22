@@ -16,7 +16,6 @@ public class EmailValidatorTests
         Assert.True(result);
     }
 
-
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
