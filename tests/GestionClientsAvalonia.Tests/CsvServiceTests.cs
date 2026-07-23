@@ -97,8 +97,7 @@ public class CsvServiceTests
         {
             File.WriteAllText(filePath, "Id;Telephone" + Environment.NewLine + "1,0600000000");
 
-            InvalidOperationException exception = 
-                Assert.Throws<InvalidOperationException>(() => CsvService.ImportClients(filePath));
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => CsvService.ImportClients(filePath));
 
             Assert.Equal("Le fichier CSV doit contenir les colonnes Nom et Email.", exception.Message);
         }
@@ -176,4 +175,37 @@ public class CsvServiceTests
             }
         }
     }
+
+    [Fact]
+    public void ExportClients_WithNewLineInName_ThrowsInvalidOperationException()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(),$"clients-test-{Guid.NewGuid()}.csv");
+
+        string name = "Martin" + Environment.NewLine + "Le Rouge";
+
+        List<Client> clients =
+        [
+            new Client
+            {
+                Id = 5,
+                Nom = name,
+                Email = "martinlerouge@example.com"
+            }
+        ];
+
+        try
+        {
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => CsvService.ExportClients(filePath, clients));
+
+            Assert.Equal("Les retours à la ligne ne sont pas autorisés dans les champs CSV.", exception.Message);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+    }
+
 }

@@ -88,7 +88,11 @@ public static class CsvService
 
     private static string EscapeCsv(string value)
     {
-        if (value.Contains(';') || value.Contains('"') || value.Contains('\n'))
+        if (value.Contains('\r') || value.Contains('\n'))
+        {
+            throw new InvalidOperationException("Les retours à la ligne ne sont pas autorisés dans les champs CSV.");
+        }
+        if (value.Contains(';') || value.Contains('"'))
         {
             value = value.Replace("\"", "\"\"");
 
