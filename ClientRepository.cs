@@ -1,14 +1,28 @@
+using System;
+using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
-
+using System.Runtime.InteropServices;
 
 
 namespace GestionClientsAvalonia;
 
 public class ClientRepository
 {
+    private readonly Func<SqliteConnection> _openConnection;
+
+    public ClientRepository() 
+        : this(Database.OpenConnection)
+    {
+    }
+
+    public ClientRepository(Func<SqliteConnection> openConnection)
+    {
+        _openConnection = openConnection ?? throw new ArgumentNullException(nameof(openConnection));
+    }
+
     public int Add(Client client)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -30,7 +44,7 @@ public class ClientRepository
     {
         List<Client> clients = new();
 
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -59,7 +73,7 @@ public class ClientRepository
 
     public bool Update(Client client)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -81,7 +95,7 @@ public class ClientRepository
 
     public bool Delete(int id)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -101,7 +115,7 @@ public class ClientRepository
     {
         List<Client> clients = new();
 
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -137,7 +151,7 @@ public class ClientRepository
 
     public bool EmailExists(string email)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText = 
@@ -156,7 +170,7 @@ public class ClientRepository
 
     public bool EmailExistsForAnotherClient(string email, int clientId)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var command = connection.CreateCommand();
 
         command.CommandText =
@@ -177,7 +191,7 @@ public class ClientRepository
 
     public int AddMany(List<Client> clients)
     {
-        using var connection = Database.OpenConnection();
+        using var connection = _openConnection();
         using var transaction = connection.BeginTransaction();
 
         int importedCount = 0;
