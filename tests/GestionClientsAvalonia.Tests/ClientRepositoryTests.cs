@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.IO.Pipelines;
 using GestionClientsAvalonia;
 using HarfBuzzSharp;
 using Microsoft.Data.Sqlite;
@@ -128,6 +129,66 @@ public class ClientRepositoryTests : IDisposable
         Assert.False(isDeleted);
         
         Assert.Empty(clients);
+    }
+
+    [Fact]
+    public void Search_WithMatchingName_ReturnsMatchingClient()
+    {
+        Client newClient = new Client
+        {
+            Nom = "Marty",
+            Email = "marty1@example.com"
+        };
+
+        Client otherClient = new Client
+        {
+            Nom= "Luna",
+            Email = "luna@example.com"
+        };
+
+        _repository.Add(newClient);
+        _repository.Add(otherClient);
+
+        List<Client> searchResults = _repository.Search("Mar");
+
+        Client searchClient = Assert.Single(searchResults);
+
+        Assert.Equal("Marty", searchClient.Nom);
+    }
+
+    [Fact]
+    public void Search_WithNoMatchingName_ReturnsEmptyList()
+    {
+        Client fakeClient = new Client
+        {
+            Nom = "Marty",
+            Email = "marty@example.com"
+
+        };
+
+        _repository.Add(fakeClient);
+
+        List<Client> searchResult = _repository.Search("Luna");
+
+        Assert.Empty(searchResult);
+    }
+
+    [Fact]
+    public void Search_IsCaseInsensitive()
+    {
+        Client newClient = new Client
+        {
+            Nom = "Marty",
+            Email = "marty@example.com"
+        };
+
+        _repository.Add(newClient);
+
+        List<Client> searchResult = _repository.Search("marty");
+
+        Client searchClient = Assert.Single(searchResult);
+
+        Assert.Equal("Marty", searchClient.Nom);
     }
 
     public void Dispose()
