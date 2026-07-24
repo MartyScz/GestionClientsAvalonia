@@ -116,12 +116,6 @@
                 Grid.Column="0"
                 PlaceholderText="Rechercher par nom ou email"
                 TextChanged="SearchTextBox_TextChanged" />
-
-            <Button
-                x:Name="SearchButton"
-                Grid.Column="1"
-                Content="Rechercher"
-                Click="SearchClient_Click" />
         </Grid>
 
         <!-- Compteur, en-têtes et liste -->

@@ -312,51 +312,6 @@ public partial class MainWindow : Window
         ShowMessage($"Client supprimé : Id {selectedClient.Id} | Nom {selectedClient.Nom}.", MessageType.Information);
     }
 
-    private void SearchClient_Click(object? sender, RoutedEventArgs e)
-    {
-        if (!EnsureDatabaseAvailable())
-        {
-            return;
-        }
-
-        string searchText = SearchTextBox.Text ?? "";
-
-        List<Client> searchResults;
-
-        try
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                searchResults = _clientRepository.GetAll();
-            }
-            else
-            {
-                searchResults = _clientRepository.Search(searchText);
-            }
-            
-        }
-        catch (SqliteException ex)
-        {
-            AppLogger.LogError("Recherche de clients - lecture dans la base de données", ex);
-            
-            ShowMessage("Une erreur de base de données est survenue pendant la recherche.", MessageType.Error);
-
-            return;
-        }
-
-        ClientListBox.SelectedItem = null;
-
-        _clients.Clear();
-
-        foreach (Client client in searchResults)
-        {
-            _clients.Add(client);
-        }
-
-        UpdateClientCount();
-        ShowMessage($"{searchResults.Count} client(s) trouvé(s).", MessageType.Information);
-    }
-
    private async void ExportClients_Click( object? sender, RoutedEventArgs e)
     {
         if (!EnsureDatabaseAvailable())
@@ -609,7 +564,6 @@ public partial class MainWindow : Window
         AddButton.IsEnabled = _isDatabaseAvailable;
         ExportButton.IsEnabled = _isDatabaseAvailable;
         ImportButton.IsEnabled = _isDatabaseAvailable;
-        SearchButton.IsEnabled = _isDatabaseAvailable;
 
         NomTextBox.IsEnabled = _isDatabaseAvailable;        
         EmailTextBox.IsEnabled = _isDatabaseAvailable;        
@@ -617,7 +571,6 @@ public partial class MainWindow : Window
         ClientListBox.IsEnabled = _isDatabaseAvailable;
 
         UpdateActionButtons();
-
     }
 
     private bool EnsureDatabaseAvailable()
@@ -641,6 +594,32 @@ public partial class MainWindow : Window
 
         if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
         {
+            List<Client> searchResults;
+
+            try
+            {
+                searchResults = _clientRepository.Search(SearchTextBox.Text.Trim());
+            }
+            catch (SqliteException ex)
+            {
+                AppLogger.LogError("Recherche dynamique des clients", ex);
+
+                ShowMessage("Impossible de rechercher les clients.", MessageType.Error);
+
+                return;
+            }
+
+            ClientListBox.SelectedItem = null;
+
+            _clients.Clear();
+
+            foreach (Client client in searchResults)
+            {
+                _clients.Add(client);
+            }
+
+            UpdateClientCount();
+
             return;
         }
 
@@ -654,7 +633,7 @@ public partial class MainWindow : Window
         {
             AppLogger.LogError("Rechargement automatique des clients - lecture dans la base de données", ex);
 
-            ShowMessage("Impossible de recharger la liste des clients.", MessageType.Error);
+            ShowMessage("Impossible de recharger la liste des clients", MessageType.Error);
 
             return;
         }
@@ -670,7 +649,6 @@ public partial class MainWindow : Window
 
         UpdateClientCount();
 
-        ShowMessage("Tous les clients sont de nouveau affichés.", MessageType.Information);
     }
 
 }
