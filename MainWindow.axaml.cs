@@ -88,13 +88,13 @@ public partial class MainWindow : Window
 
         if (email.Length > ClientRules.MaxEmailLength)
         {
-            ShowMessage($"L'adresse email ne peux pas dépasser {ClientRules.MaxEmailLength} caractères.", MessageType.Error);
+            ShowMessage($"L'adresse email ne peut pas dépasser {ClientRules.MaxEmailLength} caractères.", MessageType.Error);
             return;
         }
 
         if (!EmailValidator.IsValid(email))
         {
-            ShowMessage("L'adresse email n'est pas valide", MessageType.Error);
+            ShowMessage("L'adresse email n'est pas valide.", MessageType.Error);
 
             return;
         }
@@ -222,7 +222,7 @@ public partial class MainWindow : Window
         {
             if (_clientRepository.EmailExistsForAnotherClient(email, selectedClient.Id))
             {
-                ShowMessage("Un autre client possède déjà cette adresse email", MessageType.Error);
+                ShowMessage("Un autre client possède déjà cette adresse email.", MessageType.Error);
 
                 return;
             }
@@ -231,7 +231,7 @@ public partial class MainWindow : Window
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19 && ex.SqliteExtendedErrorCode == 2067)
         {
-            ShowMessage("Impossible de modifier ce client : cette adresse mail existe déjà.", MessageType.Error);
+            ShowMessage("Impossible de modifier ce client : cette adresse email existe déjà.", MessageType.Error);
 
             return;
         }
@@ -250,11 +250,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        int selectedIndex = ClientListBox.SelectedIndex;
-
-        _clients[selectedIndex] = updateClient;
-
-        ClientListBox.SelectedItem = updateClient;
+        RefreshDisplayClients();
 
         ShowMessage($"Client modifié : Id {updateClient.Id} | Nom : {updateClient.Nom} | Email : {updateClient.Email}", MessageType.Information);
     }
@@ -587,53 +583,36 @@ public partial class MainWindow : Window
 
     private void SearchTextBox_TextChanged(object? sender, TextChangedEventArgs e)
     {
+        RefreshDisplayClients();
+    }
+
+    private void RefreshDisplayClients()
+    {
         if (!_isDatabaseAvailable)
         {
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
-        {
-            List<Client> searchResults;
+        string searchText = SearchTextBox.Text?.Trim() ?? string.Empty;
 
-            try
-            {
-                searchResults = _clientRepository.Search(SearchTextBox.Text.Trim());
-            }
-            catch (SqliteException ex)
-            {
-                AppLogger.LogError("Recherche dynamique des clients", ex);
-
-                ShowMessage("Impossible de rechercher les clients.", MessageType.Error);
-
-                return;
-            }
-
-            ClientListBox.SelectedItem = null;
-
-            _clients.Clear();
-
-            foreach (Client client in searchResults)
-            {
-                _clients.Add(client);
-            }
-
-            UpdateClientCount();
-
-            return;
-        }
-
-        List<Client> allClients;
+        List<Client> clientsToDisplay;
 
         try
         {
-            allClients = _clientRepository.GetAll();
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                clientsToDisplay = _clientRepository.Search(searchText);
+            }
+            else
+            {
+                clientsToDisplay = _clientRepository.GetAll();
+            }
         }
         catch (SqliteException ex)
         {
-            AppLogger.LogError("Rechargement automatique des clients - lecture dans la base de données", ex);
+            AppLogger.LogError("Actualisation de la liste des clients", ex);
 
-            ShowMessage("Impossible de recharger la liste des clients", MessageType.Error);
+            ShowMessage("Impossible d'actualiser le liste des clients", MessageType.Error);
 
             return;
         }
@@ -642,7 +621,7 @@ public partial class MainWindow : Window
 
         _clients.Clear();
 
-        foreach (Client client in allClients)
+        foreach ( Client client in clientsToDisplay)
         {
             _clients.Add(client);
         }
