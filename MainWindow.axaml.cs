@@ -132,8 +132,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        _clients.Add(client);
-        UpdateClientCount();
+        RefreshDisplayClients();
 
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
