@@ -450,18 +450,7 @@ public partial class MainWindow : Window
                 ignoredCount += clientsToImport.Count - importedCount;
             }
 
-            ClientListBox.SelectedItem = null;
-            SearchTextBox.Text = "";
-
-            _clients.Clear();
-
-            List<Client> allClients = _clientRepository.GetAll();
-
-            foreach (Client client in allClients)
-            {
-                _clients.Add(client);
-            }
-            UpdateClientCount();
+            RefreshDisplayClients();
 
             ShowMessage( 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
