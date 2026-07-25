@@ -300,7 +300,7 @@ public partial class MainWindow : Window
 
         _clients.Remove(selectedClient);
         UpdateClientCount();
-        UpdateEmptyStat();
+        UpdateEmptyState();
 
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
@@ -504,6 +504,7 @@ public partial class MainWindow : Window
             }
 
             UpdateClientCount();
+            UpdateEmptyState();
 
             return true;
         }
@@ -614,10 +615,10 @@ public partial class MainWindow : Window
         }
 
         UpdateClientCount();
-        UpdateEmptyStat();
+        UpdateEmptyState();
     }
 
-    private void UpdateEmptyStat()
+    private void UpdateEmptyState()
     {
         if (_clients.Count > 0)
         {
