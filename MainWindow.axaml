@@ -16,6 +16,7 @@
         RowSpacing="10">
 
         <Grid.RowDefinitions>
+
             <!-- Formulaire et boutons -->
             <RowDefinition
                 Height="Auto"
@@ -29,6 +30,7 @@
             <RowDefinition
                 Height="*"
                 MinHeight="150" />
+
         </Grid.RowDefinitions>
 
         <!-- Zone supérieure défilable -->
@@ -103,19 +105,17 @@
                     x:Name="MessageTextBlock" />
 
             </StackPanel>
+
         </ScrollViewer>
 
         <!-- Recherche toujours visible -->
-        <Grid
-            Grid.Row="1"
-            ColumnDefinitions="*,Auto"
-            ColumnSpacing="10">
+        <Grid Grid.Row="1">
 
             <TextBox
                 x:Name="SearchTextBox"
-                Grid.Column="0"
                 PlaceholderText="Rechercher par nom ou email"
                 TextChanged="SearchTextBox_TextChanged" />
+
         </Grid>
 
         <!-- Compteur, en-têtes et liste -->
@@ -124,6 +124,7 @@
             RowDefinitions="Auto,Auto,*"
             RowSpacing="5">
 
+            <!-- Compteur -->
             <TextBlock
                 x:Name="ClientCountTextBlock"
                 Grid.Row="0"
@@ -131,6 +132,7 @@
                 FontWeight="SemiBold"
                 Margin="0,5,0,5" />
 
+            <!-- En-têtes des colonnes -->
             <Grid
                 Grid.Row="1"
                 ColumnDefinitions="60,180,*"
@@ -154,44 +156,70 @@
 
             </Grid>
 
-            <ListBox
-                x:Name="ClientListBox"
-                Grid.Row="2"
-                SelectionChanged="ClientListBox_SelectionChanged">
+            <!-- Liste et message d'état vide -->
+            <Grid Grid.Row="2">
 
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter
-                            Property="HorizontalContentAlignment"
-                            Value="Stretch" />
-                    </Style>
-                </ListBox.Styles>
+                <ListBox
+                    x:Name="ClientListBox"
+                    SelectionChanged="ClientListBox_SelectionChanged">
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="local:Client">
+                    <ListBox.Styles>
 
-                        <Grid
-                            ColumnDefinitions="60,180,*"
-                            ColumnSpacing="15">
+                        <Style Selector="ListBoxItem">
 
-                            <TextBlock
-                                Grid.Column="0"
-                                Text="{Binding Id}" />
+                            <Setter
+                                Property="HorizontalContentAlignment"
+                                Value="Stretch" />
 
-                            <TextBlock
-                                Grid.Column="1"
-                                Text="{Binding Nom}" />
+                        </Style>
 
-                            <TextBlock
-                                Grid.Column="2"
-                                Text="{Binding Email}" />
+                    </ListBox.Styles>
 
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+                    <ListBox.ItemTemplate>
 
-            </ListBox>
+                        <DataTemplate x:DataType="local:Client">
+
+                            <Grid
+                                ColumnDefinitions="60,180,*"
+                                ColumnSpacing="15">
+
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Text="{Binding Id}" />
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{Binding Nom}" />
+
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Text="{Binding Email}" />
+
+                            </Grid>
+
+                        </DataTemplate>
+
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+
+                <TextBlock
+                    x:Name="EmptyStateTextBlock"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    FontSize="16"
+                    FontStyle="Italic"
+                    Opacity="0.70"
+                    Margin="20"
+                    IsVisible="False"
+                    IsHitTestVisible="False" />
+
+            </Grid>
+
         </Grid>
 
     </Grid>
+
 </Window>

@@ -300,6 +300,7 @@ public partial class MainWindow : Window
 
         _clients.Remove(selectedClient);
         UpdateClientCount();
+        UpdateEmptyStat();
 
         NomTextBox.Text = "";
         EmailTextBox.Text = "";
@@ -347,7 +348,7 @@ public partial class MainWindow : Window
         }
         catch (UnauthorizedAccessException ex)
         {
-            AppLogger.LogError("Export CSV - accès  refusé au fichier", ex);
+            AppLogger.LogError("Export CSV - accès refusé au fichier", ex);
 
             ShowMessage("L'accès au fichier a été refusé. Vérifie ses permissions.", MessageType.Error);
 
@@ -363,10 +364,8 @@ public partial class MainWindow : Window
         {
             AppLogger.LogError("Export CSV - lecture des clients dans la base de données", ex);
 
-            ShowMessage("Une erreur de base de données est survenue pendant l'export", MessageType.Error);
+            ShowMessage("Une erreur de base de données est survenue pendant l'export.", MessageType.Error);
         }
-
-
     }
 
     private async void ImportClients_Click(object? sender, RoutedEventArgs e)
@@ -615,7 +614,24 @@ public partial class MainWindow : Window
         }
 
         UpdateClientCount();
+        UpdateEmptyStat();
+    }
 
+    private void UpdateEmptyStat()
+    {
+        if (_clients.Count > 0)
+        {
+            EmptyStateTextBlock.IsVisible = false;
+            return;
+        }
+
+        bool isSearchActive = !string.IsNullOrWhiteSpace(SearchTextBox.Text);
+
+        EmptyStateTextBlock.Text = isSearchActive
+            ?"Aucun client ne correspond à votre recherche."
+            :"Aucun client enregistré pour le moment.";
+
+        EmptyStateTextBlock.IsVisible = true;
     }
 
 }
