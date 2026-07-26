@@ -409,6 +409,12 @@ public partial class MainWindow : Window
         {
             CsvImportResult importResult = CsvService.ImportClients(filePath);
 
+            if (importResult.Clients.Count == 0 && importResult.MalformedLineCount == 0)
+            {
+                ShowMessage("Le fichier CSV ne contient aucun client à importer.", MessageType.Information);
+                return;
+            }
+
             List<Client> csvClients = importResult.Clients;
 
             int MalformedLineCount = importResult.MalformedLineCount;

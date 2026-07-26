@@ -217,4 +217,27 @@ public class CsvServiceTests
         }
     }
 
+    [Fact]
+    public void ImportClients_WithEmptyFile_ReturnsEmptyResult()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), $"clients-test-{Guid.NewGuid()}.csv");
+
+        try
+        {
+            File.WriteAllText(filePath, string.Empty);
+
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
+
+            Assert.Empty(importResult.Clients);
+            Assert.Equal(0, importResult.MalformedLineCount);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+    }
+
 }
