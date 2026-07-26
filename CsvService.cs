@@ -23,9 +23,9 @@ public static class CsvService
         }
     }
 
-    public static List<Client> ImportClients(string filePath)
+    public static CsvImportResult ImportClients(string filePath)
     {
-        List<Client> clients = new();
+        CsvImportResult result = new();
 
         using var reader = new StreamReader(filePath, Encoding.UTF8);
 
@@ -33,7 +33,7 @@ public static class CsvService
 
         if (string.IsNullOrWhiteSpace(headerLine))
         {
-            return clients;
+            return result;
         }
 
         List<string> headers = ParseCsvLine(headerLine);
@@ -63,6 +63,7 @@ public static class CsvService
 
             if (values.Count <= nomIndex || values.Count <= emailIndex)
             {
+                result.MalformedLineCount++;
                 continue;
             }
 
@@ -71,6 +72,7 @@ public static class CsvService
 
             if (string.IsNullOrWhiteSpace(nom) || string.IsNullOrWhiteSpace(email))
             {
+                result.MalformedLineCount++;
                 continue;
             }
 
@@ -80,10 +82,10 @@ public static class CsvService
                 Email = email
             };
 
-            clients.Add(client);
+            result.Clients.Add(client);
         }
 
-        return clients;
+        return result;
     }
 
     private static string EscapeCsv(string value)
@@ -140,5 +142,6 @@ public static class CsvService
 
         return values;
     }
+
 
 }

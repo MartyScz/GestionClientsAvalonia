@@ -407,8 +407,11 @@ public partial class MainWindow : Window
 
         try
         {
-            List<Client> csvClients = CsvService.ImportClients(filePath);
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
 
+            List<Client> csvClients = importResult.Clients;
+
+            int MalformedLineCount = importResult.MalformedLineCount;
             int importedCount = 0;
             int ignoredCount = 0;
             int invalidCount = 0;
@@ -454,7 +457,8 @@ public partial class MainWindow : Window
             ShowMessage( 
                 $"Import terminé : {importedCount} client(s) ajouté(s), " +
                 $"{ignoredCount} doublon(s) ignoré(s), " +
-                $"{invalidCount} adresse(s) invalide(s) ignorée(s) "+
+                $"{invalidCount} adresse(s) invalide(s) ignorée(s), " +
+                $"{MalformedLineCount} ligne(s) mal formée(s) ignorée(s), " +
                 $"{tooLongCount} ligne(s) trop longue(s) ignorée(s).", MessageType.Information);
         }
         catch (InvalidOperationException ex)

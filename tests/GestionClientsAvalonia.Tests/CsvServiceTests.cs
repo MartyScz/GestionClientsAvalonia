@@ -34,7 +34,9 @@ public class CsvServiceTests
         {
             CsvService.ExportClients(filePath, clients);
 
-            List<Client> importedClients = CsvService.ImportClients(filePath);
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
+
+            List<Client> importedClients = importResult.Clients;
 
             Assert.Equal(2, importedClients.Count);
 
@@ -71,7 +73,9 @@ public class CsvServiceTests
         {
             CsvService.ExportClients(filePath, clients);
 
-            List<Client> importedClients = CsvService.ImportClients(filePath);
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
+
+            List<Client> importedClients = importResult.Clients;
 
             Client importedClient = Assert.Single(importedClients);
 
@@ -111,7 +115,7 @@ public class CsvServiceTests
     }
 
     [Fact]
-    public void ImportClients_WithInvalidRows_IgnoresThem()
+    public void ImportClients_WithMalformedRows_IgnoresAndCountsThem()
     {
         string filePath = Path.Combine(Path.GetTempPath(),$"clients-test-{Guid.NewGuid()}.csv");
 
@@ -130,9 +134,12 @@ public class CsvServiceTests
         {
             File.WriteAllText(filePath, csvContent);
 
-            List<Client> importedClients = CsvService.ImportClients(filePath);
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
+
+            List<Client> importedClients = importResult.Clients;
 
             Assert.Equal(2, importedClients.Count);
+            Assert.Equal(3, importResult.MalformedLineCount);
 
             Assert.Equal("Marty", importedClients[0].Nom);
             Assert.Equal("marty@example.com", importedClients[0].Email);
@@ -160,7 +167,9 @@ public class CsvServiceTests
         {
             File.WriteAllText(filePath, csvContent);
 
-            List<Client> importedClients = CsvService.ImportClients(filePath);
+            CsvImportResult importResult = CsvService.ImportClients(filePath);
+
+            List<Client> importedClients = importResult.Clients;
 
             Client importedClient = Assert.Single(importedClients);
 
