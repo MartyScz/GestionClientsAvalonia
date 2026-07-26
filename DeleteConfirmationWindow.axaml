@@ -2,22 +2,32 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="GestionClientsAvalonia.DeleteConfirmationWindow"
         Title="Confirmation"
-        Width="420"
-        Height="190"
+        Width="460"
+        Height="280"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="20"
-                Spacing="16">
+    <Grid Margin="20"
+          RowDefinitions="Auto,*,Auto"
+          RowSpacing="16">
 
-        <TextBlock Text="Supprimer ce client ?"
+        <TextBlock Grid.Row="0"
+                   Text="Supprimer ce client ?"
                    FontSize="20"
                    FontWeight="SemiBold" />
 
-        <TextBlock x:Name="ClientInfoTextBlock"
-                   TextWrapping="Wrap" />
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      ClipToBounds="True">
 
-        <StackPanel Orientation="Horizontal"
+            <TextBlock x:Name="ClientInfoTextBlock"
+                       TextWrapping="Wrap" />
+
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="10">
 
@@ -29,6 +39,6 @@
 
         </StackPanel>
 
-    </StackPanel>
+    </Grid>
 
 </Window>
