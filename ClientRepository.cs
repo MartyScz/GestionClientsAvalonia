@@ -214,8 +214,6 @@ public class ClientRepository
                 command.Parameters.AddWithValue("@email", client.Email);
 
                 importedCount += command.ExecuteNonQuery();
-
-
             }
 
             transaction.Commit();

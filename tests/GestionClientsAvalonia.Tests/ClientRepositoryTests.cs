@@ -191,6 +191,36 @@ public class ClientRepositoryTests : IDisposable
         Assert.Equal("Marty", searchClient.Nom);
     }
 
+    [Fact]
+    public void AddMany_WithDuplicateEmails_InsertsOnlyClient()
+    {
+        List<Client> clients =
+        [
+            new Client
+            {
+                Nom = "Premier client",
+                Email = "doublon@example.com"
+            },
+
+            new Client
+            {
+                Nom = "Deuxième client",
+                Email = "doublon@example.com"
+            }
+        ];
+
+        int importedCount = _repository.AddMany(clients);
+
+        List<Client> savedClients = _repository.GetAll();
+
+        Assert.Equal(1, importedCount);
+
+        Client savedClient = Assert.Single(savedClients);
+
+        Assert.Equal("Premier client", savedClient.Nom);
+        Assert.Equal("doublon@example.com", savedClient.Email);
+    }
+
     public void Dispose()
     {
         if (File.Exists(_databasePath))
