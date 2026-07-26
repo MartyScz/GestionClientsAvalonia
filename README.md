@@ -4,18 +4,22 @@ Application desktop développée en C# et .NET avec Avalonia UI, permettant de g
 
 Le logiciel est pensé pour proposer une gestion simple, fiable et compréhensible des informations essentielles d’un client : son nom et son adresse email.
 
+![Icône de Gestion Clients Avalonia](Assets/GestionClientsAvalonia_Icone.png)
+
 ## État du projet
 
 Projet en cours de finalisation pour la version 1.0.0.
 
 Le cœur fonctionnel de l’application est opérationnel. Une première publication Windows 64 bits autonome a été générée et validée sur un autre ordinateur ne disposant pas de l’environnement de développement.
 
+L’identité visuelle de l’application est désormais définie et intégrée à l’exécutable ainsi qu’aux différentes fenêtres.
+
 Le travail restant porte principalement sur :
 
-- la finalisation de l’identité visuelle ;
-- la préparation des captures d’écran ;
+- la préparation de captures d’écran représentatives ;
 - la documentation d’installation et d’utilisation ;
-- la préparation de la release GitHub `v1.0.0`.
+- la préparation de l’archive Windows distribuable ;
+- la création de la release GitHub `v1.0.0`.
 
 ## Fonctionnalités actuelles
 
@@ -157,6 +161,11 @@ Les erreurs métier prévues, comme une adresse email déjà utilisée, ne sont 
   - vert pour les succès ;
   - rouge pour les erreurs ;
   - bleu pour les informations.
+- Icône personnalisée visible dans :
+  - la barre de titre de la fenêtre principale ;
+  - la fenêtre de confirmation de suppression ;
+  - la barre des tâches ;
+  - l’affichage `Alt + Tab`.
 
 ## Publication Windows
 
@@ -187,6 +196,16 @@ Les métadonnées Windows de la version 1.0.0 sont configurées :
 - nom du produit : `Gestion Clients Avalonia` ;
 - version du fichier : `1.0.0.0` ;
 - version du produit : `1.0.0`.
+
+Une icône personnalisée multi-résolution est intégrée à l’application et à l’exécutable Windows.
+
+Elle a été vérifiée dans :
+
+- l’Explorateur de fichiers ;
+- la barre de titre des fenêtres ;
+- la barre des tâches ;
+- l’affichage `Alt + Tab` ;
+- l’exécutable publié.
 
 La compilation et les tests ont également été validés en configuration `Release`.
 
@@ -243,6 +262,8 @@ dotnet test .\GestionClientsAvalonia.slnx --configuration Release
 
 ## Organisation actuelle
 
+- `Assets/GestionClientsAvalonia.ico` : icône Windows multi-résolution utilisée par l’exécutable et les fenêtres
+- `Assets/GestionClientsAvalonia_Icone.png` : version haute résolution de l’icône utilisée dans la documentation
 - `AppLogger.cs` : journalisation locale des erreurs techniques
 - `Client.cs` : modèle représentant un client
 - `ClientRules.cs` : règles communes de validation
@@ -276,6 +297,7 @@ Ce projet me permet de renforcer mes compétences en :
 - migrations de schéma ;
 - tests automatisés ;
 - compilation et publication d’une application Windows ;
+- intégration d’une identité visuelle dans une application desktop ;
 - utilisation de Git et GitHub.
 
 Le développement de l’interface me permet également de travailler :
