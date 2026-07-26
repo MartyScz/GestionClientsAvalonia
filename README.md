@@ -6,15 +6,16 @@ Le logiciel est pensé pour proposer une gestion simple, fiable et compréhensib
 
 ## État du projet
 
-Projet en cours de développement, actuellement en préparation de la version 1.0.0.
+Projet en cours de finalisation pour la version 1.0.0.
 
-Le cœur fonctionnel de l’application est opérationnel. Le travail actuel porte principalement sur :
+Le cœur fonctionnel de l’application est opérationnel. Une première publication Windows 64 bits autonome a été générée et validée sur un autre ordinateur ne disposant pas de l’environnement de développement.
 
-- la vérification des cas limites ;
-- l’amélioration de l’expérience utilisateur ;
-- la finalisation de l’interface ;
-- la préparation de la publication Windows ;
-- la finalisation de la documentation.
+Le travail restant porte principalement sur :
+
+- la finalisation de l’identité visuelle ;
+- la préparation des captures d’écran ;
+- la documentation d’installation et d’utilisation ;
+- la préparation de la release GitHub `v1.0.0`.
 
 ## Fonctionnalités actuelles
 
@@ -38,6 +39,7 @@ Le cœur fonctionnel de l’application est opérationnel. Le travail actuel por
 - Modification persistante d’un client
 - Suppression persistante d’un client
 - Fenêtre de confirmation avant la suppression
+- Conservation des boutons de confirmation accessibles même lorsque les informations du client sont très longues
 
 ### Recherche
 
@@ -66,6 +68,7 @@ Le cœur fonctionnel de l’application est opérationnel. Le travail actuel por
 - Détection des adresses email invalides
 - Détection des champs dépassant les longueurs autorisées
 - Import des lignes valides même lorsque le fichier contient des lignes incorrectes
+- Affichage d’un message spécifique lorsque le fichier ne contient aucun client à importer
 - Ajout groupé des clients dans une transaction SQLite
 - Annulation complète de la transaction en cas d’erreur technique
 - Gestion des fichiers CSV verrouillés, inaccessibles ou illisibles
@@ -139,9 +142,11 @@ Les erreurs métier prévues, comme une adresse email déjà utilisée, ne sont 
 - Taille minimale empêchant l’interface de devenir inutilisable
 - Liste des clients adaptée automatiquement à l’espace disponible
 - Barre de recherche toujours accessible
+- Navigation cohérente au clavier avec `Tab` et `Maj + Tab`
 - Organisation horizontale des boutons pour une interface plus compacte
 - Actions disponibles uniquement lorsqu’elles peuvent être utilisées
 - Confirmation demandée avant la suppression d’un client
+- Fenêtre de confirmation adaptée aux noms et adresses email de grande longueur
 - Affichage d’un message lorsque la base ne contient encore aucun client
 - Affichage d’un message spécifique lorsqu’aucun client ne correspond à la recherche
 - Mise à jour automatique du nombre de clients visibles
@@ -153,9 +158,41 @@ Les erreurs métier prévues, comme une adresse email déjà utilisée, ne sont 
   - rouge pour les erreurs ;
   - bleu pour les informations.
 
+## Publication Windows
+
+L’application peut être publiée sous la forme d’un dossier autonome pour Windows 64 bits.
+
+Cette publication inclut le runtime .NET nécessaire. L’utilisateur n’a donc pas besoin d’installer .NET séparément.
+
+La publication autonome a été testée avec succès sur un autre ordinateur Windows ne disposant ni du projet source ni de l’environnement de développement.
+
+Les vérifications effectuées comprennent :
+
+- démarrage de l’application sans Visual Studio Code ;
+- démarrage sans installation préalable de .NET ;
+- création automatique de la base SQLite au premier lancement ;
+- ajout et suppression de clients ;
+- persistance des données après redémarrage ;
+- recherche dynamique ;
+- import et export CSV.
+
+Les données personnelles utilisées pendant le développement ne sont pas intégrées au dossier publié.
+
+Chaque ordinateur crée et utilise sa propre base locale dans :
+
+`%LocalAppData%\GestionClientsAvalonia\GestionClient.db`
+
+Les métadonnées Windows de la version 1.0.0 sont configurées :
+
+- nom du produit : `Gestion Clients Avalonia` ;
+- version du fichier : `1.0.0.0` ;
+- version du produit : `1.0.0`.
+
+La compilation et les tests ont également été validés en configuration `Release`.
+
 ## Tests automatisés
 
-Le projet contient actuellement **24 tests automatisés** réalisés avec xUnit.
+Le projet contient actuellement **25 tests automatisés** réalisés avec xUnit.
 
 Les tests utilisent des bases SQLite et des fichiers CSV temporaires. Ils ne modifient pas la véritable base de données utilisée par l’application.
 
@@ -175,6 +212,7 @@ Ils vérifient notamment :
 - la conservation des points-virgules et des guillemets dans les champs CSV ;
 - la détection des colonnes CSV obligatoires ;
 - l’ignorance et le comptage des lignes CSV mal formées ;
+- le comportement lors de l’import d’un fichier CSV vide ;
 - le nettoyage des espaces autour des valeurs importées ;
 - le refus des retours à la ligne dans les champs exportés ;
 - l’ajout groupé de clients ;
@@ -184,6 +222,12 @@ Les tests peuvent être exécutés avec :
 
 ```powershell
 dotnet test .\GestionClientsAvalonia.slnx
+```
+
+Pour les exécuter en configuration `Release` :
+
+```powershell
+dotnet test .\GestionClientsAvalonia.slnx --configuration Release
 ```
 
 ## Technologies utilisées
@@ -231,12 +275,14 @@ Ce projet me permet de renforcer mes compétences en :
 - contraintes de base de données ;
 - migrations de schéma ;
 - tests automatisés ;
+- compilation et publication d’une application Windows ;
 - utilisation de Git et GitHub.
 
 Le développement de l’interface me permet également de travailler :
 
 - l’ergonomie ;
 - le redimensionnement ;
+- la navigation au clavier ;
 - l’adaptation des actions à l’état de l’application ;
 - la communication des erreurs à l’utilisateur ;
 - la conservation d’un état cohérent en cas d’échec technique.
