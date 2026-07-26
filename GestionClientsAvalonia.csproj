@@ -4,6 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <ApplicationIcon>Assets\GestionClientsAvalonia.ico</ApplicationIcon>
+
     <AssemblyTitle>Gestion Clients Avalonia</AssemblyTitle>
     <Product>Gestion Clients Avalonia</Product>
     <Description>Application desktop locale de gestion de clients.</Description>
@@ -15,6 +18,10 @@
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
   </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\GestionClientsAvalonia.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="12.1.0" />

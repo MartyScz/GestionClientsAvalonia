@@ -8,6 +8,7 @@
         d:DesignHeight="450"
         x:Class="GestionClientsAvalonia.MainWindow"
         Title="Gestion Clients"
+        Icon="/Assets/GestionClientsAvalonia.ico"
         MinWidth="650"
         MinHeight="600">
 
