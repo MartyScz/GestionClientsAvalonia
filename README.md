@@ -34,18 +34,22 @@ Une fenêtre de confirmation protège l’utilisateur contre les suppressions ac
 
 ## État du projet
 
-Projet en cours de finalisation pour la version 1.0.0.
+La version `1.0.0` de Gestion Clients Avalonia est terminée.
 
-Le cœur fonctionnel de l’application est opérationnel. Une première publication Windows 64 bits autonome a été générée et validée sur un autre ordinateur ne disposant pas de l’environnement de développement.
+L’application est fonctionnelle, documentée, testée et distribuable sous la forme d’une publication autonome pour Windows 64 bits.
 
-L’identité visuelle de l’application est définie et intégrée à l’exécutable ainsi qu’aux différentes fenêtres.
+La publication a été validée sur un autre ordinateur ne disposant ni de l’environnement de développement ni d’une installation préalable de .NET.
 
-Les captures d’écran représentatives ainsi que la documentation d’installation, d’utilisation et de sauvegarde des données sont désormais disponibles.
+Cette première version comprend notamment :
 
-Le travail restant porte principalement sur :
-
-- la préparation de l’archive Windows distribuable ;
-- la création de la release GitHub `v1.0.0`.
+- la gestion complète des clients ;
+- la recherche dynamique ;
+- l’import et l’export CSV ;
+- la validation et la protection des données ;
+- la journalisation locale des erreurs ;
+- 25 tests automatisés ;
+- une identité visuelle personnalisée ;
+- une documentation d’installation, d’utilisation et de sauvegarde.
 
 ## Fonctionnalités actuelles
 
@@ -450,4 +454,4 @@ Ce projet constitue une étape vers le développement de logiciels professionnel
 
 Créer un logiciel local de gestion de clients simple, fiable et utilisable par une petite entreprise, une association ou un indépendant.
 
-La version 1.0.0 devra proposer une application stable, documentée, testée et distribuable sous Windows.
+La version 1.0.0 propose une application stable, documentée, testée et distribuable sous Windows.
