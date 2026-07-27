@@ -40,11 +40,10 @@ Le cœur fonctionnel de l’application est opérationnel. Une première publica
 
 L’identité visuelle de l’application est définie et intégrée à l’exécutable ainsi qu’aux différentes fenêtres.
 
-Des captures d’écran représentatives des principales fonctionnalités ont également été préparées pour la présentation du projet.
+Les captures d’écran représentatives ainsi que la documentation d’installation, d’utilisation et de sauvegarde des données sont désormais disponibles.
 
 Le travail restant porte principalement sur :
 
-- la documentation d’installation et d’utilisation ;
 - la préparation de l’archive Windows distribuable ;
 - la création de la release GitHub `v1.0.0`.
 
@@ -193,6 +192,111 @@ Les erreurs métier prévues, comme une adresse email déjà utilisée, ne sont 
   - la fenêtre de confirmation de suppression ;
   - la barre des tâches ;
   - l’affichage `Alt + Tab`.
+
+## Installation
+
+La version Windows est distribuée sous la forme d’une archive autonome pour les systèmes Windows 64 bits.
+
+Pour installer et lancer l’application :
+
+1. Télécharger l’archive `GestionClientsAvalonia-v1.0.0-win-x64.zip` depuis la section **Releases** du dépôt GitHub.
+2. Extraire entièrement le contenu de l’archive dans le dossier de son choix.
+3. Ouvrir le dossier extrait.
+4. Lancer le fichier `GestionClientsAvalonia.exe`.
+
+Il est important d’extraire toute l’archive avant de lancer l’application et de conserver ensemble les fichiers présents dans le dossier publié.
+
+Le runtime .NET nécessaire est inclus dans la publication. Aucune installation séparée de .NET, de Visual Studio ou de Visual Studio Code n’est requise.
+
+Lors du premier lancement, l’application crée automatiquement sa base de données locale dans :
+
+`%LocalAppData%\GestionClientsAvalonia\GestionClient.db`
+
+Les éventuels journaux d’erreurs sont enregistrés dans :
+
+`%LocalAppData%\GestionClientsAvalonia\Logs\application.log`
+
+### Sauvegarde des données
+
+Pour sauvegarder les clients enregistrés :
+
+1. Fermer l’application.
+2. Ouvrir le dossier `%LocalAppData%\GestionClientsAvalonia`.
+3. Copier le fichier `GestionClient.db` vers un emplacement sécurisé.
+
+La restauration peut être effectuée en replaçant cette sauvegarde dans le même dossier lorsque l’application est fermée.
+
+## Utilisation
+
+### Ajouter un client
+
+1. Saisir le nom du client.
+2. Saisir son adresse email.
+3. Cliquer sur **Ajouter**.
+
+Le nom et l’adresse email sont vérifiés avant l’enregistrement. Une adresse email ne peut être utilisée que par un seul client.
+
+### Réinitialiser le formulaire
+
+Le bouton **Nouveau / Vider** permet :
+
+- d’effacer les champs du formulaire ;
+- d’annuler la sélection actuelle ;
+- de préparer la saisie d’un nouveau client.
+
+### Modifier un client
+
+1. Sélectionner un client dans la liste.
+2. Modifier son nom ou son adresse email dans le formulaire.
+3. Cliquer sur **Modifier**.
+
+Les modifications sont enregistrées immédiatement dans la base locale.
+
+### Supprimer un client
+
+1. Sélectionner un client dans la liste.
+2. Cliquer sur **Supprimer**.
+3. Vérifier les informations affichées dans la fenêtre de confirmation.
+4. Cliquer sur **Supprimer** pour confirmer ou sur **Annuler** pour conserver le client.
+
+### Rechercher un client
+
+Saisir une partie du nom ou de l’adresse email dans le champ de recherche.
+
+La liste est filtrée automatiquement pendant la saisie, sans distinction entre majuscules et minuscules.
+
+Vider le champ de recherche permet d’afficher de nouveau tous les clients.
+
+### Importer des clients depuis un fichier CSV
+
+Cliquer sur **Importer CSV**, puis sélectionner un fichier CSV contenant obligatoirement les colonnes `Nom` et `Email`.
+
+Exemple :
+
+```csv
+Nom;Email
+Alice Martin;alice.martin@example.com
+Lucas Bernard;lucas.bernard@example.com
+```
+
+Pendant l’importation, l’application contrôle notamment :
+
+- les colonnes obligatoires ;
+- le format des adresses email ;
+- les doublons déjà présents dans la base ;
+- les doublons contenus dans le fichier ;
+- les champs trop longs ;
+- les lignes mal formées.
+
+Les lignes valides sont importées même lorsque certaines lignes du fichier sont incorrectes.
+
+À la fin de l’opération, un compte rendu indique le nombre de clients ajoutés et les différentes lignes ignorées.
+
+### Exporter les clients au format CSV
+
+Cliquer sur **Exporter CSV**, puis choisir l’emplacement du fichier.
+
+L’export contient tous les clients enregistrés dans la base, même lorsqu’une recherche est active dans l’interface.
 
 ## Publication Windows
 
