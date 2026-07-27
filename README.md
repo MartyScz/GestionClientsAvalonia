@@ -6,17 +6,44 @@ Le logiciel est pensé pour proposer une gestion simple, fiable et compréhensib
 
 ![Icône de Gestion Clients Avalonia](Assets/GestionClientsAvalonia_Icone.png)
 
+## Aperçu de l’application
+
+### Vue principale
+
+L’interface permet d’ajouter, modifier, supprimer, rechercher, importer et exporter des clients.
+
+![Vue principale de Gestion Clients Avalonia](Assets/Screenshots/GestionClientsAvalonia-Principale.png)
+
+### Recherche dynamique
+
+La liste est filtrée automatiquement pendant la saisie, sans distinction entre majuscules et minuscules.
+
+![Recherche dynamique d’un client](Assets/Screenshots/GestionClientsAvalonia-Recherche.png)
+
+### Import CSV avec validation
+
+L’application importe les lignes valides et fournit un compte rendu détaillé des clients ajoutés, doublons, adresses invalides, lignes mal formées et champs trop longs.
+
+![Compte rendu d’un import CSV](Assets/Screenshots/GestionClientsAvalonia-ImportCSV.png)
+
+### Confirmation de suppression
+
+Une fenêtre de confirmation protège l’utilisateur contre les suppressions accidentelles.
+
+![Confirmation avant la suppression d’un client](Assets/Screenshots/GestionClientsAvalonia-ConfirmationSuppression.png)
+
 ## État du projet
 
 Projet en cours de finalisation pour la version 1.0.0.
 
 Le cœur fonctionnel de l’application est opérationnel. Une première publication Windows 64 bits autonome a été générée et validée sur un autre ordinateur ne disposant pas de l’environnement de développement.
 
-L’identité visuelle de l’application est désormais définie et intégrée à l’exécutable ainsi qu’aux différentes fenêtres.
+L’identité visuelle de l’application est définie et intégrée à l’exécutable ainsi qu’aux différentes fenêtres.
+
+Des captures d’écran représentatives des principales fonctionnalités ont également été préparées pour la présentation du projet.
 
 Le travail restant porte principalement sur :
 
-- la préparation de captures d’écran représentatives ;
 - la documentation d’installation et d’utilisation ;
 - la préparation de l’archive Windows distribuable ;
 - la création de la release GitHub `v1.0.0`.
@@ -264,6 +291,10 @@ dotnet test .\GestionClientsAvalonia.slnx --configuration Release
 
 - `Assets/GestionClientsAvalonia.ico` : icône Windows multi-résolution utilisée par l’exécutable et les fenêtres
 - `Assets/GestionClientsAvalonia_Icone.png` : version haute résolution de l’icône utilisée dans la documentation
+- `Assets/Screenshots/GestionClientsAvalonia-Principale.png` : présentation générale de l’interface
+- `Assets/Screenshots/GestionClientsAvalonia-Recherche.png` : démonstration de la recherche dynamique
+- `Assets/Screenshots/GestionClientsAvalonia-ImportCSV.png` : compte rendu d’un import CSV
+- `Assets/Screenshots/GestionClientsAvalonia-ConfirmationSuppression.png` : fenêtre de confirmation avant suppression
 - `AppLogger.cs` : journalisation locale des erreurs techniques
 - `Client.cs` : modèle représentant un client
 - `ClientRules.cs` : règles communes de validation
